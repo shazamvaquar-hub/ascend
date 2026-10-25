@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ASCEND – Winter Arc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg1:#02010a;--bg2:#1a0b3a;--acc:#9d5cff;--acc2:#4f7dff;--txt:#ece6ff;--mut:#8a7fae;--card:rgba(20,10,45,.62);--bd:rgba(157,92,255,.28)}
+body.winter{--acc:#8b6bff;--acc2:#3fa0ff;--bg2:#0c1535}
+body{font-family:'Rajdhani',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;font-weight:500;background:radial-gradient(ellipse at 50% -10%,var(--bg2),var(--bg1) 62%) fixed;color:var(--txt);min-height:100vh;padding-bottom:150px}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 15% 85%,rgba(120,60,255,.18),transparent 45%),radial-gradient(circle at 90% 60%,rgba(60,90,255,.14),transparent 40%);animation:aura 7s ease-in-out infinite alternate}
+@keyframes aura{from{opacity:.55}to{opacity:1}}
+.screen,.tabs,.sticky{position:relative;z-index:2}
+.tabs,.sticky{position:fixed}
+.card{box-shadow:0 0 22px rgba(157,92,255,.10),inset 0 0 18px rgba(157,92,255,.05)}
+h1{text-shadow:0 0 18px var(--acc),0 0 42px rgba(157,92,255,.6)}
+h1,h2,h3,.big,.btn,.badge,.tabs button,.sysmsg b,.chip.sel,#toast{font-family:'Orbitron','Rajdhani',system-ui,sans-serif}
+h1{font-weight:900}
+h2,h3{font-weight:700;letter-spacing:1px}
+.btn{letter-spacing:1.5px;text-transform:uppercase;font-size:14px}
+.badge{letter-spacing:1px}
+.tabs button{font-size:11px;letter-spacing:.5px;text-transform:uppercase}
+input,select,button{font-family:inherit}
+.big{text-shadow:0 0 14px rgba(157,92,255,.55)}
+.screen{display:none;padding:20px;max-width:520px;margin:0 auto;animation:fade .4s}
+.screen.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px;margin:12px 0;backdrop-filter:blur(14px)}
+h1{font-size:38px;letter-spacing:8px;text-align:center}
+h2{font-size:19px;margin:8px 0}
+h3{font-size:13px;color:var(--acc);margin-bottom:6px;text-transform:uppercase}
+p,.mut{color:var(--mut);font-size:15px;line-height:1.5}
+.splash{min-height:92vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:14px}
+.ghost{width:150px;height:200px;border-radius:80px 80px 20px 20px;background:linear-gradient(180deg,var(--acc),transparent);filter:blur(18px);opacity:.55;animation:pulse 3s infinite}
+@keyframes pulse{50%{opacity:.25;transform:scale(1.06)}}
+.btn{display:block;width:100%;padding:16px;border:0;border-radius:14px;background:linear-gradient(90deg,var(--acc),var(--acc2));color:#04111f;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 0 24px color-mix(in srgb,var(--acc) 50%,transparent)}
+.btn.ghostbtn{background:transparent;color:var(--txt);border:1px solid var(--bd);box-shadow:none}
+.sticky{position:fixed;left:0;right:0;bottom:0;padding:14px 20px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg1) 40%);max-width:520px;margin:0 auto;z-index:5}
+input,select{width:100%;padding:13px;margin:6px 0 10px;border-radius:12px;border:1px solid var(--bd);background:rgba(255,255,255,.07);color:var(--txt);font-size:17px;font-weight:600}
+select option{color:#000}
+label{font-size:12px;color:var(--mut)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+.chip{padding:10px 14px;border-radius:999px;border:1px solid var(--bd);background:var(--card);font-size:13px;cursor:pointer}
+.chip.sel{background:var(--acc);color:#04111f;font-weight:700}
+.bar{height:10px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .6s}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.big{font-size:26px;font-weight:900;color:var(--acc)}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;max-width:520px;margin:0 auto;background:rgba(6,3,18,.94);backdrop-filter:blur(16px);border-top:1px solid var(--bd);padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:9}
+.tabs button{background:none;border:0;color:var(--mut);font-size:12px;padding:6px 10px;cursor:pointer}
+.tabs button.on{color:var(--acc);font-weight:700}
+.quest{display:flex;gap:12px;align-items:center;cursor:pointer}
+.chk{width:26px;height:26px;border-radius:8px;border:2px solid var(--acc);flex:none;display:flex;align-items:center;justify-content:center;color:#04111f;font-weight:900}
+.quest.done .chk{background:var(--acc)}
+.quest.done b{text-decoration:line-through;opacity:.5}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:24px;z-index:99}
+.modal.on{display:flex}
+.modal .box{background:linear-gradient(160deg,#1a0b3a,#02010a);border:1px solid var(--acc);border-radius:22px;padding:24px;max-width:420px;width:100%;text-align:center;box-shadow:0 0 50px color-mix(in srgb,var(--acc) 40%,transparent)}
+.snow{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden;display:block}
+.snow i{position:absolute;bottom:-14px;width:5px;height:5px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px 2px var(--acc);opacity:0;animation:rise linear infinite}
+@keyframes rise{0%{transform:translateY(0) translateX(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-110vh) translateX(30px);opacity:0}}
+.ex{padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--acc);color:#04111f;font-size:11px;font-weight:800}
+.dayhead{cursor:pointer}
+.flame{font-size:34px;animation:flick 1.4s infinite}
+@keyframes flick{50%{transform:scale(1.15) rotate(-4deg)}}
+.sysmsg{border-left:3px solid var(--acc);padding:10px 12px;background:rgba(255,255,255,.04);border-radius:10px;font-size:14px;line-height:1.5}
+.sysmsg b{color:var(--acc);display:block;font-size:11px;letter-spacing:2px;margin-bottom:4px}
+.shadows{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.sh{text-align:center;padding:12px 6px;border-radius:14px;border:1px solid var(--bd);background:var(--card)}
+.sh .ic{font-size:30px}
+.sh small{display:block;font-size:11px;color:var(--mut);margin-top:4px}
+.sh.locked{opacity:.35;filter:grayscale(1)}
+.sh.risk{border-color:#ff6b6b;animation:pulse 1.2s infinite}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);max-width:92%;background:#130a2c;border:1px solid var(--acc);color:var(--txt);padding:12px 16px;border-radius:14px;z-index:120;font-size:14px;display:none;text-align:center}
+.toast.on{display:block;animation:fade .3s}
+.btn:disabled{opacity:.5;cursor:default}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<div class="snow" id="snow"></div>
+<div class="toast" id="toast"></div>
+
+<!-- SPLASH -->
+<div class="screen on" id="s-splash">
+  <div class="splash">
+    <div class="ghost"></div>
+    <h1>ASCEND</h1>
+    <p id="tagline">Level Up In Real Life</p>
+    <span class="badge">100% FREE · GOOGLE SIGN-IN · NO ADS</span>
+    <p style="max-width:300px">Your daily quests, your stats, your program. Built to help everyone become stronger.</p>
+  </div>
+  <div class="sticky"><button class="btn" id="b-google" onclick="signIn()">Continue with Google</button><p id="auth-msg" style="text-align:center;margin-top:8px"></p></div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="screen" id="s-onb">
+  <h2>Awaken, Hunter</h2>
+  <p>Tell the System about yourself. Your progress saves to your Google account.</p>
+  <div class="card">
+    <label>Hunter name</label>
+    <div style="display:flex;gap:8px;align-items:center"><input id="o-name" placeholder="Enter your hunter name" maxlength="20" style="margin:6px 0 10px"><button type="button" id="o-dice" onclick="randName()" title="Generate a name" style="flex:none;width:50px;height:46px;margin-bottom:4px;border-radius:12px;border:1px solid var(--acc);background:var(--card);color:var(--txt);font-size:22px;cursor:pointer">🎲</button></div>
+    <p id="o-err" style="color:#ff6b6b;display:none;margin:-4px 0 8px">Fill in your Hunter name first, or tap the dice to get one.</p>
+    <div class="grid">
+      <div><label>Age</label><input id="o-age" type="number" value="20"></div>
+      <div><label>Gender</label><select id="o-gen"><option value="m">Male</option><option value="f">Female</option></select></div>
+      <div><label>Height (cm)</label><input id="o-h" type="number" value="173"></div>
+      <div><label>Weight (kg)</label><input id="o-w" type="number" value="65"></div>
+    </div>
+    <label>Goals (pick one or more)</label>
+    <div class="chips multi" id="c-goal"><span class="chip sel" data-v="muscle">Build muscle</span><span class="chip" data-v="fat">Lose fat</span><span class="chip" data-v="strong">Get strong</span><span class="chip" data-v="fit">Stay fit</span></div>
+    <label>Experience</label>
+    <div class="chips" id="c-exp"><span class="chip sel" data-v="1">Beginner</span><span class="chip" data-v="1.25">Intermediate</span><span class="chip" data-v="1.5">Advanced</span></div>
+    <label>Where will you train?</label>
+    <div class="chips" id="c-eq"><span class="chip sel" data-v="home">Home (no equipment)</span><span class="chip" data-v="dumb">Home with dumbbells</span><span class="chip" data-v="gym">Gym</span></div>
+    <label>Workout days per week</label>
+    <div class="chips" id="c-days"><span class="chip" data-v="3">3</span><span class="chip sel" data-v="4">4</span><span class="chip" data-v="5">5</span><span class="chip" data-v="6">6</span></div>
+  </div>
+  <div class="sticky"><button class="btn" onclick="finishOnb()">Calculate My Program</button></div>
+</div>
+
+<!-- GOALS -->
+<div class="screen" id="s-goals">
+  <h2>Your daily targets</h2>
+  <p>Calculated from your body stats using the Mifflin-St Jeor formula.</p>
+  <div class="card" style="text-align:center"><div class="big" id="g-kcal">0</div><p>kcal per day</p></div>
+  <div class="grid">
+    <div class="card"><h3>Protein</h3><div class="big" id="g-p">0</div><p>grams</p></div>
+    <div class="card"><h3>Carbs</h3><div class="big" id="g-c">0</div><p>grams</p></div>
+    <div class="card"><h3>Fat</h3><div class="big" id="g-f">0</div><p>grams</p></div>
+    <div class="card"><h3>Water</h3><div class="big" id="g-w">0</div><p>cups</p></div>
+  </div>
+  <div class="card"><h3>System Advice</h3><p id="g-adv"></p></div>
+  <div class="sticky"><button class="btn" onclick="afterGoals()">Start My Program</button></div>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="s-home">
+  <div class="row"><div><p>Welcome back</p><h2 id="h-name">Hunter</h2></div><span class="badge" id="h-rank">E-RANK</span></div>
+  <div class="card">
+    <div class="row"><h3>LEVEL <span id="h-lvl">1</span></h3><p id="h-xp">0 / 100 XP</p></div>
+    <div class="bar"><i id="h-bar" style="width:0"></i></div>
+    <p id="h-streak"></p>
+  </div>
+  <div class="card">
+    <div class="row"><div class="row" style="justify-content:flex-start"><span class="flame">🔥</span><div><div class="big" id="f-n">0</div><p>day streak</p></div></div><div style="text-align:right"><div class="big" id="f-fz" style="font-size:24px">🧊 1</div><p>streak freezes</p></div></div>
+    <p id="f-next" style="margin-top:8px"></p>
+  </div>
+  <div class="card"><div class="sysmsg"><b>SYSTEM MESSAGE</b><span id="sys-msg"></span></div></div>
+  <div class="card"><h3>SHADOW ARMY</h3><p id="sh-sub"></p><div class="shadows" id="sh-grid"></div></div>
+  <div class="card" id="h-winter" style="display:none">
+    <div class="row"><h3>❄ WINTER ARC</h3><span class="badge" id="w-day">Day 1/90</span></div>
+    <div class="bar"><i id="w-bar" style="width:0"></i></div>
+    <p id="w-txt"></p>
+  </div>
+  <div class="card"><h3>Today's quests</h3><div id="h-quests"></div></div>
+  <div class="card"><h3>Today's workout</h3><div id="h-today"></div></div>
+</div>
+
+<!-- PROGRAM -->
+<div class="screen" id="s-prog">
+  <h2>The Awakening Program</h2>
+  <p id="p-sub"></p>
+  <div id="p-eq" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px"></div>
+  <div id="p-list"></div>
+</div>
+
+<!-- STATS -->
+<div class="screen" id="s-stats">
+  <h2>Hunter Stats</h2>
+  <div class="card" id="st-list"></div>
+  <div class="card"><h3>Body</h3><p id="st-body"></p>
+    <label>Log new weight (kg)</label><input id="st-w" type="number" step="0.1">
+    <button class="btn ghostbtn" onclick="logWeight()">Save weight</button></div>
+  <div class="card"><h3>Badges</h3><div id="st-badges"></div></div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen" id="s-prof">
+  <h2>Profile & Settings</h2>
+  <div class="card"><h3>Winter Arc</h3><p id="pf-w"></p>
+    <button class="btn ghostbtn" style="margin-top:10px" onclick="showWinterPrompt(true)">Winter Arc options</button></div>
+  <div class="card"><h3>Training place</h3><p id="pf-eq"></p>
+    <div style="margin-top:10px;display:grid;gap:8px"><button class="btn ghostbtn" onclick="setEquip('home')">Home workout (no equipment)</button><button class="btn ghostbtn" onclick="setEquip('dumb')">Home with dumbbells</button><button class="btn ghostbtn" onclick="setEquip('gym')">Gym workout</button></div></div>
+  <div class="card"><h3>Free forever</h3><p>No ads, no paywall. Sign in once with Google and your progress is saved to your account, so a phone reset never wipes it. Share this app with anyone who wants to get stronger.</p></div>
+  <div class="card"><h3>Account</h3><p id="pf-acc"></p><button class="btn ghostbtn" style="margin-top:10px" onclick="signOutNow()">Sign out</button></div>
+  <div class="card"><button class="btn ghostbtn" onclick="resetAll()">Reset all data</button></div>
+</div>
+
+<div class="tabs" id="tabs" style="display:none">
+  <button data-t="s-home" class="on">Home</button><button data-t="s-prog">Program</button><button data-t="s-stats">Stats</button><button data-t="s-prof">Profile</button>
+</div>
+
+<!-- WINTER MODAL -->
+<div class="modal" id="m-winter"><div class="box">
+  <div style="font-size:44px">❄</div>
+  <h2 id="mw-title">Winter Arc has begun</h2>
+  <p id="mw-txt" style="margin:10px 0 18px">It's October. Join the 90-day Winter Arc challenge and earn the exclusive badge, or stay focused on your daily quests only.</p>
+  <button class="btn" onclick="joinWinter()">Join the Winter Arc</button>
+  <button class="btn ghostbtn" style="margin-top:10px" onclick="declineWinter()">Just my daily quests</button>
+</div></div>
+
+<!-- LEVEL UP -->
+<div class="modal" id="m-lvl"><div class="box">
+  <p>LEVEL UP</p><h1 style="letter-spacing:4px" id="lv-n">2</h1>
+  <h2>ASCEND</h2>
+  <button class="btn" style="margin-top:16px" onclick="closeM('m-lvl')">Continue</button>
+</div></div>
+
+<script>
+const KEY='ariseWinterArc_v3';
+const $=id=>document.getElementById(id);
+let S=null;
+try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
+/* ---- Firebase config ---- */
+const FIREBASE_CONFIG={apiKey:"AIzaSyBGAGJRoXLG0TjdKoa1Y2xWIL0elnTP0Uw",authDomain:"leveling-up-cf348.firebaseapp.com",projectId:"leveling-up-cf348",storageBucket:"leveling-up-cf348.firebasestorage.app",messagingSenderId:"102743950084",appId:"1:102743950084:web:205b55a922d70e763e0651"};
+let U=null,FDB=null,FAUTH=null,pushT=null;
+const cfgOk=()=>FIREBASE_CONFIG.apiKey&&!/PASTE/.test(FIREBASE_CONFIG.apiKey);
+const save=()=>{if(S&&U&&!S.uid)S.uid=U.uid;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}pushCloud()};
+function pushCloud(now){
+  if(!U||!FDB||!S)return Promise.resolve();
+  clearTimeout(pushT);
+  const run=()=>FDB.collection('arise_users').doc(U.uid).set({data:JSON.stringify(S),updated:Date.now()});
+  if(now)return run();
+  pushT=setTimeout(()=>run().catch(e=>console.error('sync failed',e)),800);
+  return Promise.resolve();
+}
+const today=()=>new Date().toISOString().slice(0,10);
+const RANKS=['E','D','C','B','A','S'];
+const rankOf=l=>RANKS[Math.min(5,Math.floor((l-1)/5))];
+const xpNeed=l=>100+(l-1)*40;
+
+/* ---------- shadows, messages, streak freeze ---------- */
+const SHADOWS=[
+ {n:'Vanguard',ic:'🗡️',d:7},{n:'Bulwark',ic:'🛡️',d:14},{n:'Cinder',ic:'⚔️',d:21},
+ {n:'Gorehorn',ic:'🐗',d:30},{n:'Ashfang',ic:'🐺',d:45},{n:'Skitter',ic:'🐜',d:60},
+ {n:'Stormwing',ic:'🐉',d:75},{n:'Sovereign',ic:'👑',d:90}
+];
+const MSGS=[
+ 'Hunter, weakness is a choice. Today you choose strength.',
+ 'The System does not care how you feel. Complete your quests.',
+ 'Every rep is XP. Every skipped day is a shadow lost.',
+ 'You were not summoned to stay weak. Ascend.',
+ 'Pain is temporary. Rank is permanent.',
+ 'The strongest hunters were once E-rank. Keep going.',
+ 'Nobody is coming to level you up. Do it yourself.',
+ 'Discipline beats motivation. Show up today.',
+ 'Your future self is watching. Do not disappoint him.',
+ 'One more day. One more level. One more shadow.',
+ 'Rest is allowed. Quitting is not.',
+ 'The dungeon will not clear itself. Start your quests.'
+];
+function dayMsg(){
+  const d=Math.floor(Date.now()/864e5);
+  let m=MSGS[d%MSGS.length];
+  if(S&&S.streak>=3)m='Streak '+S.streak+'. The shadows are watching. '+m;
+  if(S&&S.streak===0&&S.best>0)m='Your streak broke, Hunter. Rise again today. '+m;
+  return m;
+}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),5000)}
+function dayDiff(a,b){return Math.round((new Date(b)-new Date(a))/864e5)}
+/* runs on app open: uses freezes for missed days, or resets streak */
+function checkStreak(){
+  if(!S||!S.last)return;
+  S.freezes=S.freezes==null?1:S.freezes;
+  const t=today();
+  const gap=dayDiff(S.last,t)-1; // days fully missed between last completed day and today
+  if(gap<=0)return;
+  if(S.checked===t)return;
+  S.checked=t;
+  if(S.freezes>=gap){
+    S.freezes-=gap;S.saved=true;
+    S.last=new Date(new Date(t)-864e5).toISOString().slice(0,10); // bridge the gap
+    toast('SYSTEM: Your streak was saved. '+gap+' freeze'+(gap>1?'s':'')+' used, '+S.freezes+' left.');
+  }else{
+    S.best=Math.max(S.best||0,S.streak);
+    S.freezes=0;S.streak=0;
+    toast('SYSTEM: Streak broken. Your shadows are waiting for you to return.');
+  }
+  save();
+}
+function shadowsUnlocked(){return SHADOWS.filter(s=>(S.bestStreak||0)>=s.d)}
+
+/* ---------- navigation ---------- */
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');
+  const main=['s-home','s-prog','s-stats','s-prof'].includes(id);
+  $('tabs').style.display=main?'flex':'none';
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===id));
+  if(main)render();window.scrollTo(0,0);}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>go(b.dataset.t));
+document.querySelectorAll('.chips').forEach(g=>g.addEventListener('click',e=>{
+  if(!e.target.classList.contains('chip'))return;
+  if(g.classList.contains('multi')){
+    const on=g.querySelectorAll('.sel').length;
+    if(e.target.classList.contains('sel')&&on===1)return; // keep at least one goal
+    e.target.classList.toggle('sel');return;
+  }
+  g.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));e.target.classList.add('sel');}));
+const NAME_A=['Shadow','Iron','Silent','Crimson','Frost','Storm','Night','Steel','Ghost','Thunder','Void','Ember','Raven','Lunar','Savage'];
+const NAME_B=['Wolf','Hunter','Blade','Monarch','Reaper','Falcon','Titan','Phantom','Knight','Dragon','Fang','Viper','Sentinel','Warden','Striker'];
+function randName(){
+  const n=NAME_A[Math.floor(Math.random()*NAME_A.length)]+' '+NAME_B[Math.floor(Math.random()*NAME_B.length)];
+  $('o-name').value=n;$('o-err').style.display='none';$('o-name').style.borderColor='';
+}
+$('o-name').addEventListener('input',()=>{$('o-err').style.display='none';$('o-name').style.borderColor=''});
+const chip=id=>document.querySelector('#'+id+' .sel').dataset.v;
+const chipsAll=id=>Array.from(document.querySelectorAll('#'+id+' .sel')).map(x=>x.dataset.v);
+function closeM(id){$(id).classList.remove('on')}
+
+/* ---------- winter arc logic ---------- */
+function isWinterSeason(d=new Date()){return d.getMonth()===9} // October (0-indexed)
+function winterYear(){return new Date().getFullYear()}
+function winterState(){
+  if(!S)return null;
+  const y=winterYear();
+  S.winter=S.winter||{};
+  return S.winter[y]||null; // {choice:'join'|'decline', start:'YYYY-MM-DD'}
+}
+function winterActive(){
+  const w=winterState();
+  if(!w||w.choice!=='join')return false;
+  const days=Math.floor((Date.now()-new Date(w.start).getTime())/864e5);
+  return days<90;
+}
+function winterDay(){const w=winterState();return Math.min(90,Math.floor((Date.now()-new Date(w.start).getTime())/864e5)+1)}
+function applyTheme(){
+  const w=winterState();
+  const on=isWinterSeason()||(w&&w.choice==='join'&&winterActive());
+  document.body.classList.toggle('winter',!!on);
+  $('tagline').textContent=on?'Winter Arc Season Is Here. Ascend.':'Level Up In Real Life';
+}
+function showWinterPrompt(force){
+  const w=winterState();
+  if(!force&&w)return;
+  if(!force&&!isWinterSeason())return;
+  $('mw-title').textContent=w&&w.choice==='join'?'You are in the Winter Arc':'Winter Arc has begun';
+  $('m-winter').classList.add('on');
+}
+function joinWinter(){
+  S.winter=S.winter||{};S.winter[winterYear()]={choice:'join',start:today()};save();
+  closeM('m-winter');applyTheme();render();
+}
+function declineWinter(){
+  S.winter=S.winter||{};
+  const w=S.winter[winterYear()];
+  if(!w||w.choice!=='join')S.winter[winterYear()]={choice:'decline'};
+  save();closeM('m-winter');applyTheme();render();
+}
+function checkWinterBadge(){
+  const w=winterState();
+  if(w&&w.choice==='join'&&!w.badged){
+    const days=Math.floor((Date.now()-new Date(w.start).getTime())/864e5);
+    if(days>=90){w.badged=true;S.badges=S.badges||[];S.badges.push('Winter Arc '+winterYear()+' Survivor');save();}
+  }
+}
+
+/* ---------- calculators ---------- */
+function calc(p){
+  const bmr=p.gen==='m'?10*p.w+6.25*p.h-5*p.age+5:10*p.w+6.25*p.h-5*p.age-161;
+  let tdee=bmr*(1.2+0.075*p.days);
+  const G=p.goals||[p.goal];
+  const hasF=G.includes('fat'),hasM=G.includes('muscle');
+  if(hasF&&hasM){} // recomposition: eat near maintenance
+  else if(hasF)tdee-=400;
+  else if(hasM)tdee+=250;
+  const kcal=Math.round(tdee);
+  const protein=Math.round(p.w*((hasF||hasM)?2.2:(G.includes('strong')?1.8:1.6)));
+  const fat=Math.round(kcal*0.25/9);
+  const carbs=Math.round((kcal-protein*4-fat*9)/4);
+  const water=Math.round((p.w*0.035)*1000/240*10)/10;
+  const bmi=p.w/Math.pow(p.h/100,2);
+  let adv=bmi<18.5?'Your BMI is on the lighter side. Focus on eating enough and progressive overload.':bmi<25?'Your BMI is in a healthy range. Stay consistent and increase difficulty slowly.':bmi<30?'Slightly above the healthy range. Combine strength training with daily walks.':'Start gentle, walk daily and build up slowly. Joint safety comes first.';
+  if(p.age>40)adv+=' Add mobility work and warm up well.';
+  return{kcal,protein,carbs,fat,water,bmi,adv};
+}
+
+/* ---------- program generator (level based, rotating weekly, endless day counter) ---------- */
+const LV_NAMES=['Beginner','Intermediate','Advanced'];
+const STAGE_DAYS=21; // difficulty steps up every 3 weeks
+function levelOf(p){const m=+p.exp;return m<1.1?0:(m<1.4?1:2)}
+function startOf(p){return p.start||(S&&S.weights&&S.weights[0]&&S.weights[0].d)||today()}
+function dayNum(p){return Math.max(0,dayDiff(startOf(p||S.p),today()))} // 0 = your first day
+function weekIdx(p){return Math.floor(dayNum(p)/7)}
+function dayIdx(){return dayNum(S.p)%7} // position inside the current week (0-6)
+/* 6 difficulty tiers: Beginner starts at 0, Intermediate at 2, Advanced at 4. Every 3 weeks you move one tier up (max 5). */
+function stageIdx(p){return Math.min(5,levelOf(p)*2+Math.floor(dayNum(p)/STAGE_DAYS))}
+function progInfo(){
+  const p=S.p,st=stageIdx(p);
+  return{st:st,lv:levelOf(p),left:STAGE_DAYS-(dayNum(p)%STAGE_DAYS),max:st>=5,wk:weekIdx(p)};
+}
+/* Each pool has 12 exercises, 2 per difficulty tier (easy to hard), written as 'Exercise|reps' */
+const POOL={
+ chest:['Wall Push-up|15','Incline Push-up (hands on bench)|12','Knee Push-up|12','Light Dumbbell Floor Press|12','Push-up|10','Wide Push-up|10','Decline Push-up|10','Dumbbell Bench Press|10','Heavy Dumbbell Bench Press|8','Feet-elevated Wide Push-up|12','Archer Push-up|6 each','Weighted Push-up|10'],
+ shoulder:['Light Dumbbell Shoulder Press|12','Light Seated Dumbbell Press|12','Dumbbell Shoulder Press|10','Seated Dumbbell Press|10','Pike Push-up|8','Arnold Press|10','Heavy Dumbbell Shoulder Press|8','Feet-elevated Pike Push-up|8','Heavy Arnold Press|8','Single-arm Overhead Press|8 each','Decline Pike Push-up|8','Wall Handstand Push-up|5'],
+ tri:['Bench Dip (knees bent)|10','Light Overhead Dumbbell Extension|12','Bench Dip|10','Close-grip Push-up (knees)|10','Close-grip Push-up|10','Overhead Dumbbell Extension|12','Bench Dip (feet elevated)|12','Lying Dumbbell Triceps Extension|10','Diamond Push-up|10','Tempo Bench Dip (3 sec down)|10','Weighted Dip|8','Weighted Bench Dip|10'],
+ delt:['Front Raise (light)|12','Lateral Raise (light)|12','Lateral Raise|12','Front Raise|12','Tempo Lateral Raise (3 sec down)|10','Seated Lateral Raise|12','Leaning Lateral Raise|12','Heavy Lateral Raise|10','Lateral Raise Drop Set|15','Lateral Raise with 3 sec Hold|10','Lateral Raise Burnout|20','Heavy Upright Row|10'],
+ row:['Towel Row|10','Light Dumbbell Row|10','Dumbbell Row|10','Light Bent-over Dumbbell Row|12','Bent-over Dumbbell Row|10','High-bar Inverted Row|8','Inverted Row|10','Chest-supported Dumbbell Row|10','Heavy Dumbbell Row|8','Feet-elevated Inverted Row|10','Single-arm Inverted Row|6 each','Archer Inverted Row|6 each'],
+ vert:['Light Lat Pulldown|12','Light Straight-arm Pulldown|12','Lat Pulldown|10','Assisted Pull-up|6','Negative Pull-up (5 sec down)|5','Chin-up Hold|20 sec','Pull-up|6','Wide Lat Pulldown|10','Wide Pull-up|8','Chin-up|8','Weighted Pull-up|6','Archer Pull-up|5 each'],
+ bi:['Light Dumbbell Curl|12','Light Hammer Curl|12','Dumbbell Curl|10','Hammer Curl|10','Zottman Curl|10','Incline Dumbbell Curl|10','Chin-up|6','Cross-body Hammer Curl|10','Heavy Concentration Curl|8','Slow Negative Hammer Curl|8','Weighted Chin-up|6','Heavy Dumbbell Curl|8'],
+ rear:['Light Rear Delt Fly|12','Band Pull-apart|15','Rear Delt Fly|12','Light Face Pull|15','Face Pull|15','Reverse Fly|12','Tempo Rear Delt Fly|12','Prone T Raise|10','Prone Y-T-W Raise|10','Heavy Face Pull|12','Heavy Rear Delt Fly|10','Rear Delt Fly Drop Set|15'],
+ squat:['Chair Squat|10','Wall Sit|20 sec','Bodyweight Squat|12','Box Squat|10','Goblet Squat|10','Tempo Bodyweight Squat|10','Dumbbell Squat|12','Split Squat|10 each','Bulgarian Split Squat|8 each','Jump Squat|10','Assisted Pistol Squat|5 each','Weighted Bulgarian Split Squat|8 each'],
+ lunge:['Reverse Lunge|8 each','Low Step-up|8 each','Walking Lunge|10 each','Step-up|10 each','Dumbbell Walking Lunge|10 each','Dumbbell Step-up|10 each','Deficit Reverse Lunge|8 each','High Dumbbell Step-up|8 each','Jumping Lunge|8 each','Box Jump|8','Shrimp Squat|5 each','Single-leg Box Step-down|6 each'],
+ calf:['Calf Raise|15','Seated Calf Raise|15','Slow Calf Raise|15','Calf Raise on Step|15','Single-leg Calf Raise|12 each','Dumbbell Calf Raise|15','Dumbbell Calf Raise on Step|15','Single-leg Calf Raise on Step|12 each','Weighted Single-leg Calf Raise|12 each','Calf Raise Drop Set|20','Deficit Weighted Single-leg Calf Raise|10 each','Jump Rope|60 sec'],
+ plank:['Knee Plank|20 sec','Wall Plank|30 sec','Plank|30 sec','Forearm Plank|30 sec','Plank|45 sec','Side Plank (knees)|20 sec each','Plank Shoulder Tap|40 sec','Side Plank|30 sec each','Long-lever Plank|40 sec','Plank with Leg Lift|40 sec','Plank Body Saw|12','Weighted Plank|45 sec'],
+ core:['Dead Bug (arms only)|10','Crunch|12','Dead Bug|12','Bicycle Crunch|20','Reverse Crunch|12','Lying Leg Raise|10','Hanging Knee Raise|10','V-up|10','Hanging Leg Raise|10','Hollow Hold|30 sec','Toes to Bar|8','Dragon Flag Negative|5'],
+ hinge:['Hip Hinge (bodyweight)|12','Bodyweight Good Morning|12','Light Romanian Deadlift|10','Dumbbell Good Morning|10','Romanian Deadlift|10','Stiff-leg Deadlift|10','Single-leg RDL (bodyweight)|8 each','Staggered-stance RDL|8 each','Heavy Romanian Deadlift|8','Dumbbell Single-leg RDL|8 each','Heavy Single-leg RDL|8 each','Deficit Romanian Deadlift|8'],
+ glute:['Glute Bridge|15','Glute Bridge Hold|15','Hip Thrust|12','Banded Glute Bridge|15','Dumbbell Hip Thrust|12','Single-leg Glute Bridge|10 each','Single-leg Hip Thrust|10 each','Feet-elevated Glute Bridge|15','Heavy Hip Thrust|10','Feet-elevated Single-leg Bridge|10 each','Weighted Single-leg Hip Thrust|8 each','Weighted Feet-elevated Single-leg Bridge|8 each'],
+ hamc:['Hamstring Walkout (short)|8','Glute-Ham Bridge Hold|20 sec','Stability Ball Hamstring Curl|10','Towel Hamstring Slide|8','Slider Hamstring Curl|10','Single-leg Bridge Curl|8 each','Assisted Nordic Curl|5','Slow Slider Leg Curl|8','Nordic Curl|5','Single-leg Slider Curl|6 each','Slow Nordic Curl|6','Weighted Nordic Curl|5'],
+ incline:['Light Incline Dumbbell Press|12','Steep Incline Push-up|12','Incline Dumbbell Press (moderate)|12','Incline Push-up|12','Incline Dumbbell Press|10','Incline Dumbbell Fly|12','Heavy Incline Dumbbell Press|8','Decline Dumbbell Press|10','Tempo Incline Dumbbell Press|8','Incline Dumbbell Squeeze Press|10','Paused Heavy Incline Press|6','Incline Archer Push-up|6 each']
+};
+/* Home (no equipment) pools: only floor, wall, chair, table, towel, stairs, a backpack and water bottles are needed */
+const HOME={
+ chest:['Wall Push-up|15','Incline Push-up (hands on chair)|12','Knee Push-up|12','Incline Push-up (hands on table)|15','Push-up|10','Wide Push-up|10','Decline Push-up (feet on chair)|10','Slow Push-up (3 sec down)|8','Feet-elevated Wide Push-up|12','Pseudo Planche Push-up|8','Archer Push-up|6 each','Backpack Push-up (loaded backpack)|10'],
+ shoulder:['Wall Slide|12','Pike Hold (hips high)|20 sec','Backpack Overhead Press|12','Plank to Pike|10','Pike Push-up|8','Water Bottle Shoulder Press|12','Feet-elevated Pike Push-up|8','Short Wall Walk|5','Wall Walk|5','Heavy Backpack Overhead Press|10','Decline Pike Push-up|8','Wall Handstand Push-up|5'],
+ tri:['Chair Dip (knees bent)|10','Wall Triceps Push-up|12','Chair Dip|10','Close-grip Push-up (knees)|10','Close-grip Push-up|10','Backpack Overhead Extension|12','Chair Dip (feet elevated)|12','Elbows-in Push-up|10','Diamond Push-up|10','Tempo Chair Dip (3 sec down)|10','Single-leg Chair Dip|8 each','Backpack Diamond Push-up|8'],
+ delt:['Water Bottle Front Raise|12','Water Bottle Lateral Raise|12','Slow Water Bottle Lateral Raise|12','Slow Water Bottle Front Raise|12','Tempo Water Bottle Lateral Raise|10','Seated Water Bottle Lateral Raise|12','Leaning Water Bottle Lateral Raise|12','Wall Angels|12','Plank Shoulder Reach|10 each','Pike Shoulder Tap|10 each','Water Bottle Lateral Raise Burnout|20','Wall Handstand Hold|20 sec'],
+ row:['Doorway Towel Row|10','Prone Superman Row|12','Backpack Bent-over Row|12','Table Row (sturdy table)|8','Inverted Row (sturdy table)|8','One-arm Doorway Towel Row|8 each','Feet-elevated Table Row|10','Heavy Backpack Row|10','Single-arm Backpack Row|8 each','Tempo Table Row|8','Single-arm Table Row|6 each','Archer Table Row|6 each'],
+ vert:['Prone Lat Pull (floor)|12','Superman Hold|20 sec','Doorway Towel Pull|10','Reverse Snow Angel|12','Sliding Towel Lat Pull|10','Towel Pull-down Isometric|20 sec','Backpack Pullover|12','Prone Y Raise|12','Single-arm Sliding Towel Pull|8 each','Doorway Row Hold|20 sec','Heavy Backpack Pullover|12','One-arm Doorway Row|8 each'],
+ bi:['Light Backpack Curl|12','Water Bottle Curl|12','Backpack Curl|10','Towel Isometric Curl|20 sec','Backpack Hammer Curl|10','Slow Water Bottle Curl|10','Towel Resistance Curl|10','Backpack Concentration Curl|10 each','Heavy Backpack Curl|8','Underhand Table Row|8','Underhand Inverted Row (sturdy table)|8','Heavy Backpack Hammer Curl|8'],
+ rear:['Reverse Snow Angel|12','Prone T Raise|10','Prone Y Raise|10','Wall Slide|12','Superman Hold|20 sec','Prone Y-T-W Raise|10','Tempo Reverse Snow Angel|12','Water Bottle Reverse Fly|12','Backpack Reverse Fly (bent over)|12','Prone Swimmer|20','Heavy Water Bottle Reverse Fly|12','Prone Y-T-W Hold|20 sec'],
+ squat:['Chair Squat|10','Wall Sit|20 sec','Bodyweight Squat|12','Box Squat (to chair)|10','Backpack Goblet Squat|10','Tempo Bodyweight Squat|10','Backpack Squat|12','Split Squat|10 each','Bulgarian Split Squat (rear foot on chair)|8 each','Jump Squat|10','Assisted Pistol Squat|5 each','Backpack Bulgarian Split Squat|8 each'],
+ lunge:['Reverse Lunge|8 each','Low Step-up (stairs)|8 each','Walking Lunge|10 each','Step-up (stairs)|10 each','Backpack Walking Lunge|10 each','Backpack Step-up|10 each','Deficit Reverse Lunge|8 each','High Step-up (chair)|8 each','Jumping Lunge|8 each','Stair Jump|8','Shrimp Squat|5 each','Single-leg Chair Step-down|6 each'],
+ calf:['Calf Raise|15','Seated Calf Raise|15','Slow Calf Raise|15','Calf Raise on Step|15','Single-leg Calf Raise|12 each','Backpack Calf Raise|15','Backpack Calf Raise on Step|15','Single-leg Calf Raise on Step|12 each','Backpack Single-leg Calf Raise|12 each','Calf Raise Drop Set|20','Deficit Single-leg Calf Raise (backpack)|10 each','Jump Rope (or imaginary rope)|60 sec'],
+ plank:['Knee Plank|20 sec','Wall Plank|30 sec','Plank|30 sec','Forearm Plank|30 sec','Plank|45 sec','Side Plank (knees)|20 sec each','Plank Shoulder Tap|40 sec','Side Plank|30 sec each','Long-lever Plank|40 sec','Plank with Leg Lift|40 sec','Plank Body Saw (socks on floor)|12','Backpack Plank|45 sec'],
+ core:['Dead Bug (arms only)|10','Crunch|12','Dead Bug|12','Bicycle Crunch|20','Reverse Crunch|12','Lying Leg Raise|10','Lying Knee Tuck|12','V-up|10','Slow Lying Leg Raise|10','Hollow Hold|30 sec','Hollow Rock|20','Dragon Flag Negative (on bed)|5'],
+ hinge:['Hip Hinge (bodyweight)|12','Bodyweight Good Morning|12','Backpack Good Morning|10','Light Backpack Romanian Deadlift|10','Backpack Romanian Deadlift|10','Stiff-leg Backpack Deadlift|10','Single-leg RDL (bodyweight)|8 each','Staggered-stance RDL|8 each','Heavy Backpack Romanian Deadlift|8','Backpack Single-leg RDL|8 each','Heavy Backpack Single-leg RDL|8 each','Single-leg RDL with Reach|8 each'],
+ glute:['Glute Bridge|15','Glute Bridge Hold|15','Hip Thrust (back on sofa)|12','Glute Bridge March|12','Backpack Hip Thrust|12','Single-leg Glute Bridge|10 each','Single-leg Hip Thrust (back on sofa)|10 each','Feet-elevated Glute Bridge|15','Heavy Backpack Hip Thrust|10','Feet-elevated Single-leg Bridge|10 each','Backpack Single-leg Hip Thrust|8 each','Backpack Feet-elevated Single-leg Bridge|8 each'],
+ hamc:['Hamstring Walkout (short)|8','Glute-Ham Bridge Hold|20 sec','Towel Hamstring Slide|8','Bridge Walkout|8','Towel Slider Hamstring Curl|10','Single-leg Bridge Curl|8 each','Assisted Nordic Curl (feet under sofa)|5','Slow Towel Leg Curl|8','Nordic Curl (feet under sofa)|5','Single-leg Towel Curl|6 each','Slow Nordic Curl|6','Nordic Curl with Pause|5'],
+ incline:['Incline Push-up (hands on chair)|12','Steep Incline Push-up|12','Incline Push-up (hands on table)|12','Knee Push-up|12','Incline Push-up|10','Wide Incline Push-up|12','Decline Push-up|10','Slow Incline Push-up (3 sec down)|10','Pseudo Planche Push-up|8','Feet-elevated Push-up|12','Incline Archer Push-up|6 each','Backpack Push-up|10']
+};
+/* Full gym pools: machines, cables, barbells and dumbbells */
+const GYM={
+ chest:['Chest Press Machine (light)|12','Pec Deck Fly (light)|12','Chest Press Machine|10','Light Cable Crossover|12','Smith Machine Bench Press|10','Incline Chest Press Machine|10','Barbell Bench Press|8','Dumbbell Bench Press|10','Heavy Barbell Bench Press|6','Weighted Dip (chest lean)|8','Paused Barbell Bench Press|5','Heavy Dumbbell Bench Press|6'],
+ shoulder:['Light Shoulder Press Machine|12','Light Seated Dumbbell Shoulder Press|12','Shoulder Press Machine|10','Smith Machine Shoulder Press|10','Seated Dumbbell Shoulder Press|10','Arnold Press|10','Standing Barbell Overhead Press|8','Heavy Dumbbell Shoulder Press|8','Heavy Barbell Overhead Press|6','Push Press|6','Paused Overhead Press|5','Heavy Single-arm Dumbbell Overhead Press|8 each'],
+ tri:['Light Cable Triceps Pushdown|12','Assisted Dip Machine|10','Cable Triceps Pushdown|12','Rope Triceps Pushdown|12','Overhead Cable Triceps Extension|12','EZ-bar Skull Crusher|10','Close-grip Barbell Bench Press|8','Parallel Bar Dip|10','Heavy Rope Pushdown|10','Heavy Skull Crusher|8','Weighted Dip|8','Heavy Close-grip Bench Press|6'],
+ delt:['Light Machine Lateral Raise|12','Light Cable Lateral Raise|12','Machine Lateral Raise|12','Dumbbell Lateral Raise|12','Cable Lateral Raise|12','Seated Dumbbell Lateral Raise|12','Leaning Cable Lateral Raise|12','Heavy Dumbbell Lateral Raise|10','Lateral Raise Drop Set|15','Cable Upright Row|12','Barbell Upright Row|8','Lateral Raise Burnout|20'],
+ row:['Light Seated Cable Row|12','Light Machine Row|12','Seated Cable Row|10','Machine Row|10','Chest-supported Dumbbell Row|10','Light T-bar Row|10','Barbell Bent-over Row|8','T-bar Row|8','Heavy Barbell Row|6','Pendlay Row|6','Heavy T-bar Row|6','Heavy Single-arm Dumbbell Row|8 each'],
+ vert:['Light Lat Pulldown|12','Assisted Pull-up Machine|8','Lat Pulldown|10','Close-grip Lat Pulldown|10','Wide-grip Lat Pulldown|10','Negative Pull-up|5','Pull-up|6','Chin-up|6','Wide Pull-up|8','Heavy Lat Pulldown|8','Weighted Pull-up|6','Archer Pull-up|5 each'],
+ bi:['Light Cable Curl|12','Light Machine Curl|12','Dumbbell Curl|10','Cable Rope Hammer Curl|10','EZ-bar Curl|10','Incline Dumbbell Curl|10','Preacher Curl|10','Chin-up|6','Heavy EZ-bar Curl|8','Spider Curl|10','Weighted Chin-up|6','Heavy Preacher Curl|8'],
+ rear:['Light Machine Reverse Fly|12','Light Cable Face Pull|15','Machine Reverse Fly|12','Cable Face Pull|15','Rear Delt Dumbbell Fly|12','Rope Face Pull|15','Cable Reverse Fly|12','Heavy Face Pull|12','Chest-supported Rear Delt Row|10','Heavy Machine Reverse Fly|10','Rear Delt Drop Set|15','Heavy Cable Reverse Fly|12'],
+ squat:['Light Leg Press|12','Light Goblet Squat|10','Leg Press|10','Smith Machine Squat|10','Goblet Squat|10','Hack Squat Machine|10','Barbell Back Squat|8','Front Squat|8','Heavy Barbell Back Squat|6','Paused Squat|5','Heavy Front Squat|5','Barbell Bulgarian Split Squat|6 each'],
+ lunge:['Light Leg Extension|12','Reverse Lunge|8 each','Leg Extension|12','Walking Lunge|10 each','Dumbbell Walking Lunge|10 each','Dumbbell Step-up|10 each','Barbell Lunge|8 each','Smith Machine Split Squat|8 each','Heavy Dumbbell Bulgarian Split Squat|8 each','Heavy Step-up|8 each','Barbell Walking Lunge|8 each','Leg Extension Drop Set|15'],
+ calf:['Light Seated Calf Raise Machine|15','Light Leg Press Calf Raise|15','Seated Calf Raise Machine|15','Leg Press Calf Raise|15','Standing Calf Raise Machine|12','Smith Machine Calf Raise|12','Heavy Standing Calf Raise|10','Single-leg Calf Raise on Step|12 each','Heavy Seated Calf Raise|10','Donkey Calf Raise|12','Calf Raise Drop Set|20','Heavy Single-leg Calf Raise|10 each'],
+ plank:['Knee Plank|20 sec','Light Cable Crunch|12','Plank|30 sec','Cable Crunch|12','Plank|45 sec','Short Ab Wheel Rollout (knees)|8','Plank Shoulder Tap|40 sec','Ab Wheel Rollout (knees)|8','Weighted Plank|45 sec','Cable Pallof Press|12 each','Ab Wheel Standing Rollout|6','Plank Body Saw|12'],
+ core:['Light Crunch Machine|12','Dead Bug|12','Crunch Machine|12','Captain Chair Knee Raise|10','Cable Woodchop|12 each','Reverse Crunch|12','Hanging Knee Raise|10','Decline Sit-up|12','Hanging Leg Raise|10','Weighted Cable Crunch|12','Toes to Bar|8','Weighted Decline Sit-up|10'],
+ hinge:['Light Back Extension|12','Light Cable Pull-through|12','Back Extension|12','Cable Pull-through|12','Light Barbell Romanian Deadlift|10','Dumbbell Romanian Deadlift|10','Barbell Romanian Deadlift|8','Light Trap-bar Deadlift|8','Heavy Barbell Romanian Deadlift|6','Conventional Deadlift|5','Heavy Deadlift|4','Deficit Deadlift|5'],
+ glute:['Glute Bridge|15','Light Cable Kickback|12 each','Hip Thrust Machine|12','Cable Kickback|12 each','Dumbbell Hip Thrust|12','Smith Machine Hip Thrust|10','Barbell Hip Thrust|8','Single-leg Hip Thrust|10 each','Heavy Barbell Hip Thrust|6','Heavy Cable Pull-through|10','Paused Barbell Hip Thrust|6','Banded Barbell Hip Thrust|8'],
+ hamc:['Light Seated Leg Curl|12','Light Lying Leg Curl|12','Seated Leg Curl|12','Lying Leg Curl|12','Stability Ball Hamstring Curl|10','Cable Leg Curl|12 each','Assisted Glute-Ham Raise|6','Heavy Leg Curl|10','Glute-Ham Raise|6','Nordic Curl|5','Slow Nordic Curl|6','Weighted Glute-Ham Raise|6'],
+ incline:['Light Incline Chest Press Machine|12','Light Cable Fly|12','Incline Chest Press Machine|10','Low-to-High Cable Fly|12','Incline Dumbbell Press|10','Smith Machine Incline Press|10','Incline Barbell Press|8','Heavy Incline Dumbbell Press|8','Heavy Incline Barbell Press|6','Decline Chest Press|8','Paused Incline Barbell Press|5','Heavy Incline Dumbbell Fly|10']
+};
+function srcOf(p){return p.equip==='home'?HOME:(p.equip==='gym'?GYM:POOL)}
+/* the 6 training days of a week: which exercise pool fills each slot */
+const SPLIT=[
+ {n:'Push Strength Foundation',f:'Chest, shoulders, triceps',s:['chest','shoulder','tri','delt']},
+ {n:'Pull Strength Foundation',f:'Back and biceps',s:['row','vert','bi','rear']},
+ {n:'Lower Body Stability',f:'Quads and calves',s:['squat','lunge','lunge','calf']},
+ {n:'Core and Shoulder Balance',f:'Abs and shoulders',s:['plank','core','shoulder','rear']},
+ {n:'Compound Push Pull Mix',f:'Upper body',s:['chest','row','incline','bi']},
+ {n:'Glute and Hamstring Focus',f:'Posterior chain',s:['hinge','glute','glute','hamc']}
+];
+/* picks from the 4 exercises of your current difficulty window; the choice rotates every week so no two weeks match */
+function pickEx(pool,st,wk,seed,used,src){
+  const P=src[pool],lo=Math.min(st,4)*2,cand=st>=5?P.slice(6,12):P.slice(lo,lo+4); // at max tier, rotate across the 6 hardest
+  const n=cand.length,start=(wk+seed)%n;
+  for(let i=0;i<n;i++){const c=cand[(start+i)%n];if(!used[c.split('|')[0]]){used[c.split('|')[0]]=1;return c}}
+  return cand[start];
+}
+function buildProgram(p,st,wk){
+  if(st==null)st=stageIdx(p);
+  if(wk==null)wk=weekIdx(p);
+  const s3=levelOf(p)===2?4:3; // advanced does one extra set
+  const used={},src=srcOf(p);
+  const D=SPLIT.map((d,di)=>({n:d.n,f:d.f,e:d.s.map((pl,si)=>{const q=pickEx(pl,st,wk,di*3+si,used,src).split('|');return[q[0],s3,q[1]]})}));
+  const G=p.goals||[p.goal];
+  if(G.includes('fat'))D.forEach(d=>d.e.push(['Brisk Walk or Jog','1','15 min']));
+  if(G.includes('strong'))D.forEach(d=>{if(d.e[0]&&d.e[0][1]!=='1'){d.e[0]=[d.e[0][0],String(Math.max(4,+d.e[0][1]+1)),'5']}}); // heavy low-rep first lift
+  if(G.includes('muscle')&&!G.includes('strong'))D.forEach(d=>{if(d.e[1]&&d.e[1][1]!=='1')d.e[1]=[d.e[1][0],String(+d.e[1][1]+1),d.e[1][2]]}); // extra volume
+  if(G.includes('fit'))D.forEach(d=>d.e.push(['Mobility and stretching','1','5 min']));
+  if(+p.age>40||p.bmi>=30)D.forEach(d=>d.e.unshift(['Mobility warm-up','1','5 min']));
+  const order={3:[0,1,2],4:[0,1,2,3],5:[0,1,2,3,4],6:[0,1,2,3,4,5]}[p.days];
+  const week=[];let k=0;
+  const pick=order.map(i=>D[i]);
+  const slots={3:[0,2,4],4:[0,1,3,4],5:[0,1,2,4,5],6:[0,1,2,3,4,5]}[p.days];
+  for(let i=0;i<7;i++){
+    if(slots.includes(i)){week.push(pick[k%pick.length]);k++}
+    else{
+      const RESTS=[
+        {n:'Rest and Recovery',f:'Walk, stretch, sleep well',e:[['Light walk','1','20 min'],['Stretching','1','10 min']]},
+        {n:'Mobility Day',f:'Loosen up tight muscles',e:[['Hip and shoulder mobility','1','10 min'],['Gentle foam rolling or stretching','1','10 min']]},
+        {n:'Weekly Reset',f:'Full recovery before the next week',e:[['Easy walk','1','30 min'],['Deep stretching','1','10 min']]}
+      ];
+      const r=i===6?RESTS[2]:RESTS[(i+wk)%2];
+      week.push({n:r.n,f:r.f,e:r.e.map(x=>x.slice()),rest:true});
+    }
+  }
+  return week;
+}
+/* rebuilds this week's plan when the week or difficulty tier changes (checked on every render) */
+const PROG_VER=4; // bump when the program layout changes so saved plans rebuild
+function refreshProgram(){
+  if(!S||!S.p)return;
+  const st=stageIdx(S.p),wk=weekIdx(S.p);
+  if(S.stage===st&&S.wk===wk&&S.pv===PROG_VER&&S.prog)return;
+  const upTier=S.stage!=null&&st>S.stage,newWk=S.wk!=null&&wk>S.wk;
+  S.prog=buildProgram(S.p,st,wk);S.stage=st;S.wk=wk;S.pv=PROG_VER;save();
+  if(upTier)setTimeout(()=>toast('SYSTEM: Training upgraded. Your exercises just got harder, Hunter.'),700);
+  else if(newWk)setTimeout(()=>toast('SYSTEM: Week '+(wk+1)+' begins. New exercises unlocked.'),700);
+}
+const DAYNAMES=['Day 1','Day 2','Day 3','Day 4','Day 5','Day 6','Day 7'];
+
+/* ---------- onboarding ---------- */
+function finishOnb(){
+  const nm=$('o-name').value.trim();
+  if(!nm){
+    $('o-err').style.display='block';$('o-name').style.borderColor='#ff6b6b';$('o-name').focus();
+    toast('SYSTEM: Fill in your Hunter name first.');return;
+  }
+  const ag=+$('o-age').value,ht=+$('o-h').value,wt=+$('o-w').value;
+  if(!(ag>=12&&ag<=90)){toast('SYSTEM: Enter a valid age between 12 and 90.');$('o-age').focus();return}
+  if(!(ht>=120&&ht<=230)){toast('SYSTEM: Enter a valid height between 120 and 230 cm.');$('o-h').focus();return}
+  if(!(wt>=30&&wt<=250)){toast('SYSTEM: Enter a valid weight between 30 and 250 kg.');$('o-w').focus();return}
+  const goals=chipsAll('c-goal');
+  const p={name:nm,goals:goals,age:+$('o-age').value||20,gen:$('o-gen').value,h:+$('o-h').value||170,w:+$('o-w').value||65,goal:goals[0],exp:chip('c-exp'),days:+chip('c-days'),equip:chip('c-eq'),start:today()};
+  const c=calc(p);p.bmi=c.bmi;
+  S={p,c,prog:buildProgram(p,stageIdx(p),0),stage:stageIdx(p),wk:0,pv:PROG_VER,xp:0,lvl:1,stats:{STR:10,AGI:10,VIT:10,INT:10,SNS:10},done:{},streak:0,best:0,bestStreak:0,freezes:1,last:'',weights:[{d:today(),w:p.w}],badges:[],winter:{}};
+  save();
+  $('g-kcal').textContent=c.kcal;$('g-p').textContent=c.protein;$('g-c').textContent=c.carbs;$('g-f').textContent=c.fat;$('g-w').textContent=c.water;$('g-adv').textContent=c.adv;
+  go('s-goals');
+}
+function afterGoals(){go('s-home');setTimeout(()=>showWinterPrompt(false),400)}
+
+/* ---------- quests ---------- */
+function todayWorkout(){return S.prog[dayIdx()]}
+function dailyQuests(){
+  const m=+S.p.exp,q=[
+   {id:'water',t:'Drink '+S.c.water+' cups of water',xp:15,st:'VIT'},
+   {id:'protein',t:'Hit '+S.c.protein+'g protein',xp:20,st:'STR'},
+   {id:'sleep',t:'Sleep 7 to 8 hours',xp:15,st:'SNS'},
+   {id:'walk',t:'Walk '+Math.round(6000*m)+' steps',xp:20,st:'AGI'}
+  ];
+  const w=todayWorkout();
+  q.unshift({id:'workout',t:w.rest?'Active recovery':'Complete: '+w.n,xp:w.rest?15:50,st:'STR'});
+  if(winterActive())q.push({id:'winter',t:'❄ Winter Arc: no excuses today',xp:30,st:'INT'});
+  return q;
+}
+function toggleQuest(id){
+  const t=today();S.done[t]=S.done[t]||{};
+  const q=dailyQuests().find(x=>x.id===id);if(!q)return;
+  if(S.done[t][id]){ // tapped by mistake: undo it
+    delete S.done[t][id];
+    S.xp-=q.xp;S.stats[q.st]=Math.max(1,S.stats[q.st]-1);
+    if(S.last===t){
+      S.xp-=25;
+      if(S.undo&&S.undo.d===t){S.streak=S.undo.streak;S.last=S.undo.last;S.bestStreak=S.undo.bestStreak;S.freezes=S.undo.freezes}
+      else{S.streak=Math.max(0,S.streak-1);S.last=S.streak>0?new Date(Date.now()-864e5).toISOString().slice(0,10):''}
+      S.undo=null;
+    }
+    while(S.xp<0&&S.lvl>1){S.lvl--;S.xp+=xpNeed(S.lvl)}
+    if(S.xp<0)S.xp=0;
+    save();render();return;
+  }
+  S.done[t][id]=true;S.xp+=q.xp;S.stats[q.st]+=1;
+  const all=dailyQuests().every(x=>S.done[t][x.id]);
+  if(all&&S.last!==t){
+    const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+    S.undo={d:t,streak:S.streak,last:S.last,bestStreak:S.bestStreak||0,freezes:S.freezes==null?1:S.freezes};
+    S.streak=S.last===y?S.streak+1:1;S.last=t;S.xp+=25;
+    S.bestStreak=Math.max(S.bestStreak||0,S.streak);
+    S.freezes=S.freezes==null?1:S.freezes;
+    if(S.streak%7===0){S.freezes=Math.min(3,S.freezes+1);toast('SYSTEM: 7-day streak. +1 streak freeze earned.')}
+    const ns=SHADOWS.find(s=>s.d===S.streak);
+    if(ns)setTimeout(()=>toast('SHADOW EXTRACTED: '+ns.n+' '+ns.ic+' joins your army.'),600);
+  }
+  let up=false;
+  while(S.xp>=xpNeed(S.lvl)){S.xp-=xpNeed(S.lvl);S.lvl++;up=true}
+  save();render();
+  if(up){$('lv-n').textContent=S.lvl;$('m-lvl').classList.add('on')}
+}
+const EQS=[{v:'home',t:'Home',d:'home workouts, no equipment needed.'},{v:'dumb',t:'Dumbbells',d:'home workouts with dumbbells.'},{v:'gym',t:'Gym',d:'gym workouts with machines, cables and barbells.'}];
+function curEq(){return S.p.equip==='home'||S.p.equip==='gym'?S.p.equip:'dumb'}
+function setEquip(v){
+  if(curEq()===v&&S.p.equip===v)return;
+  S.p.equip=v;S.pv=0;save();render();
+  toast('SYSTEM: Program switched to '+EQS.find(e=>e.v===v).d);
+}
+function renderEq(){
+  const c=curEq();
+  $('p-eq').innerHTML=EQS.map(e=>'<span class="chip'+(c===e.v?' sel':'')+'" onclick="setEquip(\''+e.v+'\')">'+e.t+'</span>').join('');
+}
+function logWeight(){
+  const v=+$('st-w').value;if(!v)return;
+  S.weights.push({d:today(),w:v});save();$('st-w').value='';render();
+}
+
+/* ---------- render ---------- */
+function render(){
+  if(!S)return;
+  refreshProgram();checkWinterBadge();applyTheme();
+  $('h-name').textContent=S.p.name;
+  $('h-lvl').textContent=S.lvl;$('h-rank').textContent=rankOf(S.lvl)+'-RANK';
+  $('h-xp').textContent=S.xp+' / '+xpNeed(S.lvl)+' XP';
+  $('h-bar').style.width=(S.xp/xpNeed(S.lvl)*100)+'%';
+  $('h-streak').textContent='Streak: '+S.streak+' day'+(S.streak==1?'':'s');
+  S.freezes=S.freezes==null?1:S.freezes;
+  $('f-n').textContent=S.streak;$('f-fz').textContent='🧊 '+S.freezes;
+  const nx=SHADOWS.find(s=>s.d>S.streak);
+  $('f-next').textContent=nx?((nx.d-S.streak)+' more day'+(nx.d-S.streak>1?'s':'')+' to unlock '+nx.n+' '+nx.ic):'All shadows unlocked. You are the Sovereign.';
+  $('sys-msg').textContent=dayMsg();
+  const unl=shadowsUnlocked().length;
+  $('sh-sub').textContent=unl+' of '+SHADOWS.length+' shadows extracted. Keep your streak to grow your army.';
+  $('sh-grid').innerHTML=SHADOWS.map(s=>{const u=(S.bestStreak||0)>=s.d;const risk=u&&S.streak===0;return '<div class="sh '+(u?'':'locked')+(risk?' risk':'')+'"><div class="ic">'+(u?s.ic:'🔒')+'</div><b>'+s.n+'</b><small>'+(u?(risk?'Waiting':'Day '+s.d):'Day '+s.d)+'</small></div>'}).join('');
+  const t=today(),dn=S.done[t]||{};
+  $('h-quests').innerHTML=dailyQuests().map(q=>`<div class="quest ex ${dn[q.id]?'done':''}" onclick="toggleQuest('${q.id}')"><div class="chk">${dn[q.id]?'✓':''}</div><div style="flex:1"><b>${q.t}</b><p>+${q.xp} XP · ${q.st}</p></div></div>`).join('');
+  const w=todayWorkout();
+  $('h-today').innerHTML=`<span class="badge">Day ${dayNum()+1}</span> <b>${w.n}</b><p>${w.f}</p>`+w.e.map(e=>`<div class="ex">${e[0]} — ${e[1]==='1'?e[2]:e[1]+' x '+e[2]}</div>`).join('');
+  const wa=winterActive();
+  $('h-winter').style.display=wa?'block':'none';
+  if(wa){const d=winterDay();$('w-day').textContent='Day '+d+' / 90';$('w-bar').style.width=(d/90*100)+'%';$('w-txt').textContent=(90-d)+' days left. Stay consistent and earn the Winter Arc badge.'}
+  const GN={muscle:'build muscle',fat:'lose fat',strong:'get strong',fit:'stay fit'};
+  const PI=progInfo();renderEq();$('p-sub').textContent=S.p.days+' training days per week, built to '+(S.p.goals||[S.p.goal]).map(g=>GN[g]).join(' + ')+'. Week '+(PI.wk+1)+' · Level: '+LV_NAMES[PI.lv]+' · Difficulty '+(PI.st+1)+'/6 · '+(PI.max?'Maximum difficulty reached.':'Next upgrade in '+PI.left+' day'+(PI.left===1?'':'s')+'.');
+  $('p-list').innerHTML=S.prog.map((d,i)=>`<div class="card"><div class="row dayhead"><div><h3>Day ${PI.wk*7+i+1}${i===dayIdx()?' · <span style="color:#fff">TODAY</span>':''}</h3><b>${d.n}</b><p>${d.f}</p></div></div>`+d.e.map(e=>`<div class="ex">${e[0]} — ${e[1]==='1'?e[2]:e[1]+' x '+e[2]}</div>`).join('')+'</div>').join('');
+  $('st-list').innerHTML=Object.entries(S.stats).map(([k,v])=>`<div class="row"><b>${{STR:'Strength',AGI:'Agility',VIT:'Vitality',INT:'Intelligence',SNS:'Sense'}[k]}</b><span>${v}</span></div><div class="bar"><i style="width:${Math.min(100,v)}%"></i></div>`).join('');
+  const first=S.weights[0].w,last=S.weights[S.weights.length-1].w;
+  $('st-body').textContent='Start '+first+' kg, now '+last+' kg ('+(last-first>=0?'+':'')+(last-first).toFixed(1)+' kg). BMI '+S.p.bmi.toFixed(1)+'.';
+  $('st-badges').innerHTML=(S.badges&&S.badges.length)?S.badges.map(b=>'<span class="badge" style="margin:4px">'+b+'</span>').join(''):'<p>No badges yet. Complete the Winter Arc to earn one.</p>';
+  if($('pf-eq'))$('pf-eq').textContent='Current: '+EQS.find(e=>e.v===curEq()).d.replace(/\.$/,'')+'. Pick the one that matches where you train. Your plan updates right away.';
+  const ws=winterState();
+  if($('pf-acc'))$('pf-acc').textContent=U?('Signed in as '+(U.email||U.displayName||'your Google account')+'. Progress saves automatically.'):'';
+  $('pf-w').textContent=ws?(ws.choice==='join'?'You joined the Winter Arc on '+ws.start+'.':'You chose daily quests only this year. The System will ask again next October.'):(isWinterSeason()?'Winter Arc season is live. Tap below to choose.':'Winter Arc opens every October automatically.');
+}
+
+/* ---------- snow ---------- */
+(function(){const s=$('snow');for(let i=0;i<34;i++){const e=document.createElement('i');e.style.left=Math.random()*100+'%';const z=2+Math.random()*5;e.style.width=z+'px';e.style.height=z+'px';e.style.animationDuration=(9+Math.random()*10)+'s';e.style.animationDelay=(-Math.random()*14)+'s';s.appendChild(e)}})();
+
+/* ---------- login (required) ---------- */
+function setMsg(t,err){const m=$('auth-msg');if(m){m.textContent=t;m.style.color=err?'#ff6b6b':''}}
+function initAuth(){
+  applyTheme();go('s-splash');
+  if(typeof firebase==='undefined'){$('b-google').disabled=true;setMsg('Could not load sign-in. Check your internet and reload.',true);return}
+  if(!cfgOk()){$('b-google').disabled=true;setMsg('Setup needed: add your Firebase config (FIREBASE_CONFIG) in the code.',true);return}
+  firebase.initializeApp(FIREBASE_CONFIG);
+  FAUTH=firebase.auth();FDB=firebase.firestore();
+  setMsg('Checking sign-in...');$('b-google').disabled=true;
+  FAUTH.onAuthStateChanged(u=>{u?onSignedIn(u):onSignedOut()});
+}
+async function onSignedIn(u){
+  U=u;setMsg('Loading your hunter data...');
+  try{
+    const snap=await FDB.collection('arise_users').doc(u.uid).get();
+    if(snap.exists){S=JSON.parse(snap.data().data);S.uid=u.uid;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+    else if(S&&S.p&&(!S.uid||S.uid===u.uid)){S.uid=u.uid;save();await pushCloud(true)}
+    else S=null;
+  }catch(e){
+    console.error(e);S=null;$('b-google').disabled=false;
+    setMsg('Could not load your data. Check your internet and tap to retry.',true);go('s-splash');return;
+  }
+  setMsg('');
+  if(S&&S.p){checkStreak();refreshProgram();applyTheme();go('s-home');setTimeout(()=>showWinterPrompt(false),500)}
+  else{applyTheme();go('s-onb')}
+}
+function onSignedOut(){U=null;$('b-google').disabled=false;setMsg('');go('s-splash')}
+function signIn(){
+  if(!FAUTH)return;
+  if(U){onSignedIn(U);return}
+  const b=$('b-google');b.disabled=true;setMsg('Opening Google...');
+  const prov=new firebase.auth.GoogleAuthProvider();
+  FAUTH.signInWithPopup(prov).catch(e=>{
+    if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment'){FAUTH.signInWithRedirect(prov);return}
+    b.disabled=false;
+    setMsg(e.code==='auth/popup-closed-by-user'?'Sign-in cancelled. Tap to try again.':'Sign-in failed ('+(e.code||'error')+'). If you are in a preview, open the hosted app link instead.',true);
+  });
+}
+function signOutNow(){
+  if(!confirm('Sign out? Your progress stays safe in your Google account.'))return;
+  pushCloud(true).catch(()=>{}).then(()=>FAUTH.signOut()).then(()=>{S=null;try{localStorage.removeItem(KEY)}catch(e){}go('s-splash')});
+}
+async function resetAll(){
+  if(!confirm('Reset everything? This also deletes your saved progress from your Google account.'))return;
+  try{if(U&&FDB)await FDB.collection('arise_users').doc(U.uid).delete()}catch(e){toast('SYSTEM: Could not reset cloud data. Try again.');return}
+  try{localStorage.removeItem(KEY)}catch(e){}
+  S=null;go('s-onb');
+}
+
+/* ---------- boot ---------- */
+try{initAuth()}catch(err){console.error(err);go('s-splash');setMsg('Something went wrong. Reload the app.',true)}
+</script>
+</body>
+</html>
