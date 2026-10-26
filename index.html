@@ -3,6 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1a0b3a">
+<meta name="description" content="ASCEND is a free fitness app with daily quests, XP, streaks and workout plans for home or gym.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <title>ASCEND – Winter Arc</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,13 +105,13 @@ label{font-size:12px;color:var(--mut)}
     <span class="badge">100% FREE · GOOGLE SIGN-IN · NO ADS</span>
     <p style="max-width:300px">Your daily quests, your stats, your program. Built to help everyone become stronger.</p>
   </div>
-  <div class="sticky"><button class="btn" id="b-google" onclick="signIn()">Continue with Google</button><p id="auth-msg" style="text-align:center;margin-top:8px"></p></div>
+  <div class="sticky"><button class="btn" id="b-google" onclick="signIn()">Continue with Google</button><p id="auth-msg" style="text-align:center;margin-top:8px"></p><p style="text-align:center;margin-top:4px;font-size:13px">By continuing you confirm you are 13 or older and accept the <a href="privacy.html" style="color:var(--acc)">Privacy Policy</a>.</p></div>
 </div>
 
 <!-- ONBOARDING -->
 <div class="screen" id="s-onb">
   <h2>Awaken, Hunter</h2>
-  <p>Tell the System about yourself. Your progress saves to your Google account.</p>
+  <p>Tell the System about yourself. Your progress saves to your Google account. ASCEND is for ages 13 and over.</p>
   <div class="card">
     <label>Hunter name</label>
     <div style="display:flex;gap:8px;align-items:center"><input id="o-name" placeholder="Enter your hunter name" maxlength="20" style="margin:6px 0 10px"><button type="button" id="o-dice" onclick="randName()" title="Generate a name" style="flex:none;width:50px;height:46px;margin-bottom:4px;border-radius:12px;border:1px solid var(--acc);background:var(--card);color:var(--txt);font-size:22px;cursor:pointer">🎲</button></div>
@@ -190,6 +197,7 @@ label{font-size:12px;color:var(--mut)}
     <button class="btn ghostbtn" style="margin-top:10px" onclick="showWinterPrompt(true)">Winter Arc options</button></div>
   <div class="card"><h3>Training place</h3><p id="pf-eq"></p>
     <div style="margin-top:10px;display:grid;gap:8px"><button class="btn ghostbtn" onclick="setEquip('home')">Home workout (no equipment)</button><button class="btn ghostbtn" onclick="setEquip('dumb')">Home with dumbbells</button><button class="btn ghostbtn" onclick="setEquip('gym')">Gym workout</button></div></div>
+  <div class="card"><h3>About</h3><p>ASCEND gives general fitness information, not medical advice. Talk to a doctor before starting a new exercise program, and stop if something hurts.</p><p style="margin-top:8px"><a href="privacy.html" style="color:var(--acc)">Privacy Policy</a></p></div>
   <div class="card"><h3>Free forever</h3><p>No ads, no paywall. Sign in once with Google and your progress is saved to your account, so a phone reset never wipes it. Share this app with anyone who wants to get stronger.</p></div>
   <div class="card"><h3>Account</h3><p id="pf-acc"></p><button class="btn ghostbtn" style="margin-top:10px" onclick="signOutNow()">Sign out</button></div>
   <div class="card"><button class="btn ghostbtn" onclick="resetAll()">Reset all data</button></div>
@@ -524,7 +532,7 @@ function finishOnb(){
     toast('SYSTEM: Fill in your Hunter name first.');return;
   }
   const ag=+$('o-age').value,ht=+$('o-h').value,wt=+$('o-w').value;
-  if(!(ag>=12&&ag<=90)){toast('SYSTEM: Enter a valid age between 12 and 90.');$('o-age').focus();return}
+  if(!(ag>=13&&ag<=90)){toast('SYSTEM: ASCEND is for ages 13 and over. Enter an age between 13 and 90.');$('o-age').focus();return}
   if(!(ht>=120&&ht<=230)){toast('SYSTEM: Enter a valid height between 120 and 230 cm.');$('o-h').focus();return}
   if(!(wt>=30&&wt<=250)){toast('SYSTEM: Enter a valid weight between 30 and 250 kg.');$('o-w').focus();return}
   const goals=chipsAll('c-goal');
@@ -688,6 +696,8 @@ async function resetAll(){
   try{localStorage.removeItem(KEY)}catch(e){}
   S=null;go('s-onb');
 }
+
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
 /* ---------- boot ---------- */
 try{initAuth()}catch(err){console.error(err);go('s-splash');setMsg('Something went wrong. Reload the app.',true)}
