@@ -87,6 +87,12 @@ label{font-size:12px;color:var(--mut)}
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);max-width:92%;background:#130a2c;border:1px solid var(--acc);color:var(--txt);padding:12px 16px;border-radius:14px;z-index:120;font-size:14px;display:none;text-align:center}
 .toast.on{display:block;animation:fade .3s}
 .btn:disabled{opacity:.5;cursor:default}
+.acg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.ach{text-align:center;padding:10px 4px;border-radius:14px;border:1px solid rgba(157,92,255,.35);background:rgba(157,92,255,.12)}
+.ach .ic{font-size:26px}.ach b{display:block;font-size:12px;margin-top:2px}.ach small{display:block;font-size:10px;opacity:.75;margin-top:2px}
+.ach.locked{opacity:.45;filter:grayscale(1)}
+.mac{margin:10px 0}.mac .row{margin-bottom:4px}
+.kc{text-align:center;margin:6px 0 10px}.kc b{font-size:34px;display:block}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -183,11 +189,13 @@ label{font-size:12px;color:var(--mut)}
 <!-- STATS -->
 <div class="screen" id="s-stats">
   <h2>Hunter Stats</h2>
+  <button class="btn" onclick="shareCard()">Share my progress</button>
   <div class="card" id="st-list"></div>
+  <div class="card"><h3>Your nutrition plan</h3><div id="nu-box"></div></div>
   <div class="card"><h3>Body</h3><p id="st-body"></p>
     <label>Log new weight (kg)</label><input id="st-w" type="number" step="0.1">
     <button class="btn ghostbtn" onclick="logWeight()">Save weight</button></div>
-  <div class="card"><h3>Badges</h3><div id="st-badges"></div></div>
+  <div class="card"><div class="row"><h3>Achievements</h3><span class="badge" id="ac-n"></span></div><div id="ac-grid" class="acg"></div><div id="st-badges" style="margin-top:8px"></div></div>
 </div>
 
 <!-- PROFILE -->
@@ -638,11 +646,70 @@ function render(){
   $('st-list').innerHTML=Object.entries(S.stats).map(([k,v])=>`<div class="row"><b>${{STR:'Strength',AGI:'Agility',VIT:'Vitality',INT:'Intelligence',SNS:'Sense'}[k]}</b><span>${v}</span></div><div class="bar"><i style="width:${Math.min(100,v)}%"></i></div>`).join('');
   const first=S.weights[0].w,last=S.weights[S.weights.length-1].w;
   $('st-body').textContent='Start '+first+' kg, now '+last+' kg ('+(last-first>=0?'+':'')+(last-first).toFixed(1)+' kg). BMI '+S.p.bmi.toFixed(1)+'.';
-  $('st-badges').innerHTML=(S.badges&&S.badges.length)?S.badges.map(b=>'<span class="badge" style="margin:4px">'+b+'</span>').join(''):'<p>No badges yet. Complete the Winter Arc to earn one.</p>';
+  $('st-badges').innerHTML=(S.badges||[]).map(b=>'<span class="badge" style="margin:4px">'+b+'</span>').join('');renderAch();renderNutrition();
   if($('pf-eq'))$('pf-eq').textContent='Current: '+EQS.find(e=>e.v===curEq()).d.replace(/\.$/,'')+'. Pick the one that matches where you train. Your plan updates right away.';
   const ws=winterState();
   if($('pf-acc'))$('pf-acc').textContent=U?('Signed in as '+(U.email||U.displayName||'your Google account')+'. Progress saves automatically.'):'';
   $('pf-w').textContent=ws?(ws.choice==='join'?'You joined the Winter Arc on '+ws.start+'.':'You chose daily quests only this year. The System will ask again next October.'):(isWinterSeason()?'Winter Arc season is live. Tap below to choose.':'Winter Arc opens every October automatically.');
+}
+
+
+/* ---------- achievements, nutrition plan, share card ---------- */
+const ACH=[
+ {n:'First Step',d:'Finish 1 quest',ic:'👟',f:a=>a.q>=1},
+ {n:'Getting Going',d:'Finish 10 quests',ic:'⚡',f:a=>a.q>=10},
+ {n:'Quest Hunter',d:'Finish 50 quests',ic:'🎯',f:a=>a.q>=50},
+ {n:'Quest Master',d:'Finish 200 quests',ic:'🏅',f:a=>a.q>=200},
+ {n:'First Sweat',d:'1 workout done',ic:'💦',f:a=>a.w>=1},
+ {n:'Iron Habit',d:'10 workouts done',ic:'🏋️',f:a=>a.w>=10},
+ {n:'Machine',d:'30 workouts done',ic:'⚙️',f:a=>a.w>=30},
+ {n:'Unstoppable',d:'75 workouts done',ic:'🚀',f:a=>a.w>=75},
+ {n:'On Fire',d:'3 day streak',ic:'🔥',f:a=>a.b>=3},
+ {n:'One Week',d:'7 day streak',ic:'📅',f:a=>a.b>=7},
+ {n:'Two Weeks',d:'14 day streak',ic:'🌙',f:a=>a.b>=14},
+ {n:'Monthly',d:'30 day streak',ic:'🌟',f:a=>a.b>=30},
+ {n:'Legend',d:'60 day streak',ic:'👑',f:a=>a.b>=60},
+ {n:'Rising',d:'Reach level 5',ic:'📈',f:a=>a.l>=5},
+ {n:'Strong Spirit',d:'Reach level 10',ic:'💎',f:a=>a.l>=10},
+ {n:'Elite',d:'Reach level 20',ic:'🦅',f:a=>a.l>=20},
+ {n:'Hydrated',d:'Drink water 7 days',ic:'💧',f:a=>a.h>=7},
+ {n:'Scale Check',d:'Log weight 3 times',ic:'⚖️',f:a=>a.s>=3},
+ {n:'Army of Three',d:'Extract 3 shadows',ic:'🐺',f:a=>a.sh>=3},
+ {n:'Ice Veteran',d:'Win a Winter Arc',ic:'❄️',f:a=>a.wa}
+];
+function achStats(){
+  const d=Object.values(S.done||{});
+  return{q:d.reduce((n,x)=>n+Object.values(x).filter(Boolean).length,0),w:d.filter(x=>x.workout).length,h:d.filter(x=>x.water).length,
+   b:S.bestStreak||0,l:S.lvl,s:(S.weights||[]).length-1,sh:shadowsUnlocked().length,wa:(S.badges||[]).some(b=>/Survivor/.test(b))};
+}
+function renderAch(){
+  const a=achStats(),got=ACH.filter(x=>x.f(a)).length;
+  $('ac-n').textContent=got+' / '+ACH.length;
+  $('ac-grid').innerHTML=ACH.map(x=>{const u=x.f(a);return '<div class="ach '+(u?'':'locked')+'"><div class="ic">'+(u?x.ic:'❔')+'</div><b>'+(u?x.n:'Unknown')+'</b><small>'+x.d+'</small></div>'}).join('');
+}
+function renderNutrition(){
+  const c=S.c,pk=c.protein*4,ck=c.carbs*4,fk=c.fat*9,t=pk+ck+fk||1;
+  const row=(n,g,k,col)=>'<div class="mac"><div class="row"><b>'+n+'</b><span>'+g+' g</span></div><div class="bar"><i style="width:'+Math.round(k/t*100)+'%;background:'+col+'"></i></div></div>';
+  $('nu-box').innerHTML='<div class="kc"><p>Daily calorie goal</p><b>'+c.kcal+' kcal</b></div>'+row('Protein',c.protein,pk,'#9d5cff')+row('Carbs',c.carbs,ck,'#4fa3ff')+row('Fat',c.fat,fk,'#ffb84f')+'<p>Water: '+c.water+' cups a day.</p>';
+}
+function shareCard(){
+  const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
+  let g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#2a1270');g.addColorStop(.55,'#12072e');g.addColorStop(1,'#04020c');x.fillStyle=g;x.fillRect(0,0,W,H);
+  g=x.createRadialGradient(W/2,420,20,W/2,420,520);g.addColorStop(0,'rgba(157,92,255,.55)');g.addColorStop(1,'rgba(157,92,255,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.textAlign='center';x.fillStyle='#fff';x.font='italic 900 64px sans-serif';x.fillText('A S C E N D',W/2,130);
+  x.strokeStyle='#7fb4ff';x.lineWidth=8;x.shadowColor='#7fb4ff';x.shadowBlur=30;x.strokeRect(190,210,700,500);x.shadowBlur=0;
+  x.fillStyle='#fff';x.font='italic 900 190px sans-serif';x.fillText('LVL '+S.lvl,W/2,470);
+  x.fillStyle='#c7a6ff';x.font='bold 56px sans-serif';x.fillText(rankOf(S.lvl)+'-RANK  ·  Day '+(dayNum()+1),W/2,570);
+  x.fillStyle='#fff';x.font='bold 50px sans-serif';x.fillText(S.p.name,W/2,660);
+  const a=achStats(),box=[[S.streak,'DAY STREAK'],[a.w,'WORKOUTS'],[ACH.filter(z=>z.f(a)).length,'ACHIEVEMENTS']];
+  box.forEach((b,i)=>{const cx=210+i*330;x.fillStyle='rgba(255,255,255,.08)';x.fillRect(cx-140,800,280,230);x.fillStyle='#fff';x.font='italic 900 96px sans-serif';x.fillText(b[0],cx,925);x.fillStyle='#9fd0ff';x.font='bold 26px sans-serif';x.fillText(b[1],cx,985)});
+  x.fillStyle='#fff';x.font='italic 900 74px sans-serif';x.fillText('I AM ASCENDING',W/2,1160);
+  x.fillStyle='#b2a8d4';x.font='36px sans-serif';x.fillText('Free fitness quests. Join me.',W/2,1230);x.fillText('shazamvaquar-hub.github.io/ascend',W/2,1290);
+  cv.toBlob(async bl=>{
+    const f=new File([bl],'ascend-progress.png',{type:'image/png'});
+    try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:'My ASCEND progress'});return}}catch(e){if(e&&e.name==='AbortError')return}
+    const u=URL.createObjectURL(bl),l=document.createElement('a');l.href=u;l.download='ascend-progress.png';document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast('SYSTEM: Progress card saved.');
+  });
 }
 
 /* ---------- snow ---------- */
