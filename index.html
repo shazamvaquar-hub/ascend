@@ -218,10 +218,21 @@ label{font-size:12px;color:var(--mut)}
 <!-- WINTER MODAL -->
 <div class="modal" id="m-winter"><div class="box">
   <div style="font-size:44px">❄</div>
-  <h2 id="mw-title">Winter Arc has begun</h2>
-  <p id="mw-txt" style="margin:10px 0 18px">It's October. Join the 90-day Winter Arc challenge and earn the exclusive badge, or stay focused on your daily quests only.</p>
-  <button class="btn" onclick="joinWinter()">Join the Winter Arc</button>
+  <h2 id="mw-title">Winter Arc is on</h2>
+  <div id="mw-a">
+  <p style="margin:10px 0 18px">The 90-day Winter Arc runs from October to January. Join any day, even late. It has its own exercises that start easy and get a little harder every day. Not sure? Try it, and leave anytime from Profile.</p>
+  <button class="btn" onclick="winterNext()">Join the Winter Arc</button>
   <button class="btn ghostbtn" style="margin-top:10px" onclick="declineWinter()">Just my daily quests</button>
+  </div>
+  <div id="mw-b" style="display:none">
+  <p id="mw-cur" style="margin:8px 0"></p>
+  <p id="mw-pick" style="margin:6px 0 12px"></p>
+  <button class="btn" onclick="pickMode(0)">Beginner<br><small>Start very easy</small></button>
+  <button class="btn" style="margin-top:8px" onclick="pickMode(1)">Intermediate<br><small>Start at medium</small></button>
+  <button class="btn" style="margin-top:8px" onclick="pickMode(2)">Advanced<br><small>Start hard</small></button>
+  <button class="btn ghostbtn" style="margin-top:12px" onclick="leaveWinter()" id="mw-leave">Leave the Winter Arc</button>
+  <button class="btn ghostbtn" style="margin-top:8px" onclick="closeM('m-winter')">Close</button>
+  </div>
 </div></div>
 
 <!-- LEVEL UP -->
@@ -331,9 +342,53 @@ const chip=id=>document.querySelector('#'+id+' .sel').dataset.v;
 const chipsAll=id=>Array.from(document.querySelectorAll('#'+id+' .sel')).map(x=>x.dataset.v);
 function closeM(id){$(id).classList.remove('on')}
 
+/* ---------- Winter Arc program: its own exercises, slow daily climb ---------- */
+const WL_RAW={
+ pc:['Counter Push-up|8-12','Stair Push-up|8-12','Staggered-hand Push-up|8-12','Hand-release Push-up|8-12','Spiderman Push-up|6-10|each','Hindu Push-up|8-12','Explosive Push-up|6-10','Typewriter Push-up|5-8|each'],
+ ps:['Arm Circle Burn|30-45|sec','Bear Hold|15-25|sec','Bear Crawl Shoulder Tap|10-16|each','Pike Shrug|8-12','Pike Walkout|6-10','Bear Crawl Forward-Back|30-40|sec','Pike-to-Push-up Flow|6-10','Wall Handstand Shrug|8-12'],
+ pt:['Counter Triceps Press|8-12','Bed-edge Dip|8-12','Table Skull Crusher|8-12','Bed-edge Dip (legs straight)|8-12','Elbows-tight Push-up|8-12','Bed-edge Dip (feet on chair)|10-14','Pseudo Triceps Push-up|8-12','One-leg Bed-edge Dip|6-10|each'],
+ f1:['March in Place|60-90|sec','Step Jack|30-45|sec','Jumping Jack|30-45|sec','High Knees|30-45|sec','Skater Hop|30-45|sec','Squat Thrust|10-16','Burpee|10-15','Burpee with Tuck Jump|10-15'],
+ f2:['Shadow Boxing|45-60|sec','Fast Feet Shuffle|20-30|sec','Cross-body Mountain Climber|30-45|sec','Plank Jack|20-30','Lateral Shuffle Sprint|30-45|sec','Star Jump|12-18','Tuck Jump|10-15','Speed Skater Burst|40-50|sec'],
+ lq:['Sit-to-Stand (slow)|10-15','Squat Pulse|12-18','Sumo Squat|12-16','Cossack Squat|8-12|each','Skater Squat|6-10|each','Squat Hold Jump|8-12','Pistol Squat to Chair|4-8|each','Split Squat Jump|8-12|each'],
+ ls:['Standing Knee Drive|10-14|each','Curtsy Lunge|8-12|each','Lateral Lunge|8-12|each','Clock Lunge|4-6|each','Curtsy Lunge (pause)|8-10|each','Lateral Lunge to Balance|8-10|each','Lunge Pulse|12-16|each','Scissor Jump|10-14|each'],
+ lg:['Donkey Kick|12-16|each','Fire Hydrant|12-16|each','Frog Pump|15-20','Glute Kickback Hold|10-14|each','Single-leg Frog Pump|10-14|each','Frog Jump|8-12','Broad Jump|6-10','Rocket Jump|8-12'],
+ ca:['Step Touch|60-90|sec','Marching Jack|45-60|sec','Heel Dig Hop|45-60|sec','Power Skip|40-50|sec','Box Step Run (stairs)|40-50|sec','Stair Sprint|20-30|sec','Hill Sprint (stairs)|20-30|sec','Shuttle Run|30-40|sec'],
+ cb:['Boxer Shuffle|45-60|sec','Jab-Cross Combo|45-60|sec','Hook Combo|45-60|sec','Uppercut Combo|45-60|sec','Fast Hands|30-45|sec','Sprawl and Punch|10-14','Boxer Burpee|10-14','Shadow Box Sprint|40-50|sec'],
+ cc:['Ankle Hops|30-45|sec','Pogo Hop|30-45|sec','Lateral Hop|30-45|sec','Cross Jack|30-45|sec','Seal Jack|30-45|sec','Plyo Jack|20-30|sec','Ski Jump|30-40|sec','Tuck Hop|12-18'],
+ ka:['Heel Tap|16-24','Knee Hug|10-14','Flutter Kick|20-30|sec','Scissor Kick|20-30|sec','Toe Touch Crunch|14-20','Boat Hold|20-30|sec','Hollow Flutter|20-30|sec','Boat Twist|16-24'],
+ kb:['Bear Plank Hold|15-25|sec','Forearm Plank Reach|8-12|each','Plank Up-Down|8-12|each','Plank Hip Dip|12-16|each','Inchworm Walkout|6-10','Spiderman Plank|8-12|each','Plank Knee-to-Elbow|10-14|each','Long Plank Reach|10-14|each'],
+ kc:['Side Bend Reach|12-16|each','Standing Oblique Crunch|12-16|each','Side-lying Leg Lift|12-16|each','Russian Twist (feet down)|16-24','Russian Twist (feet up)|16-24','Side Plank Reach|8-12|each','Side Plank Hip Lift|10-14|each','Windshield Wiper (bent knees)|8-12|each'],
+ ua:['Prone Cobra Lift|10-14','Prone Cobra Hold|15-25|sec','Superman Pulse|12-16','Hands-behind Back Extension|10-14','Reverse Plank|20-30|sec','Reverse Plank Leg Lift|8-12|each','Reverse Table-top Press|10-14','Reverse Plank March|10-14|each'],
+ ub:['Door-frame Lean Row|10-14','Door-frame Row (feet forward)|8-12','Bedsheet Row|8-12','Bedsheet Row (feet forward)|8-12','Door-frame Row Pause|8-12','Single-arm Door-frame Row|6-10|each','Single-arm Bedsheet Row|6-10|each','Slow Bedsheet Row|6-10'],
+ uc:['Scapular Squeeze|12-16','Prone W Squeeze|10-14','Swimmer Pulse|20-30|sec','Prone Snow Wipe|10-14','Bird-dog Row (backpack)|8-12|each','Bird-dog Pull-through|8-12|each','Superman Y-W Flow|8-12','Cobra to Superman Row|8-12'],
+ sa:['Squat Reach|12-16','Squat to Heel Raise|12-16','Squat Reach Jump|8-12','Squat-to-Lunge Combo|8-12|each','Squat Thrust to Stand|8-12','Squat to Push-up Flow|6-10','Plyo Squat Thrust|8-12','Summit Squat Series|10-14'],
+ sb:['Inchworm|6-10','Crab Walk|20-30|sec','Crab Reach|10-14|each','Lizard Crawl|20-30|sec','Beast Crawl Lateral|20-30|sec','Spider Crawl|20-30|sec','Crawl Flow Circuit|40-60|sec','Beast Jump Crawl|40-60|sec'],
+ sc:['Single-leg Balance Reach|8-12|each','Airplane Balance|15-25|sec','Single-leg Hop in Place|8-12|each','Skater Lunge Hop|8-12|each','Bound Series|6-10','Single-leg Broad Hop|5-8|each','Summit Jumps|8-12','Max-height Tuck Jump|8-12']
+};
+const WL={};Object.keys(WL_RAW).forEach(k=>{WL[k]=WL_RAW[k].map(s=>{const q=s.split('|'),r=q[1].split('-');return{n:q[0],a:+r[0],b:+r[1],u:q[2]||''}})});
+const WDAYS=[
+ {n:'Frost Push',f:'Chest, shoulders, triceps',s:['pc','ps','pt','f1']},
+ {n:'Glacier Legs',f:'Legs and glutes',s:['lq','ls','lg','f2']},
+ {n:'Blizzard Cardio',f:'Heart and stamina',s:['ca','cb','cc','f1']},
+ {n:'Ice Core',f:'Abs, sides and waist',s:['ka','kb','kc','f2']},
+ {n:'Avalanche Back',f:'Back and posture',s:['ua','ub','uc','f1']},
+ {n:'Summit Full Body',f:'Everything together',s:['sa','sb','sc','f2']},
+ {n:'Thaw Day',f:'Rest, stretch and recover',rest:true,e:[['Slow walk','1','20 min'],['Full-body stretch','1','10 min'],['Drink water and sleep early','1','all day']]}
+];
+function wLoad(w,di){const m=w.mode!=null?w.mode:levelOf(S.p);return[0,4,8][m]+Math.max(0,di-(w.rb||0))/7} // climbs 1 step every week, a little each day
+function wEx(lad,load){const t=Math.min(7,Math.floor(load/2)),e=lad[t],fr=Math.min(t===7?2:1,(load-2*t)/2),v0=e.a+(e.b-e.a)*fr,v=e.u==='sec'?Math.round(v0/5)*5:Math.round(v0);return{n:e.n,r:v+(e.u?' '+e.u:'')}}
+function winterDayWorkout(di){
+  const w=winterState(),d=WDAYS[di%7],load=wLoad(w,di);
+  if(d.rest)return{n:d.n,f:d.f,e:d.e,rest:true};
+  const sets=String(load>=8?4:3);
+  const e=d.s.map(k=>{const x=wEx(WL[k],load);return[x.n,sets,x.r]});
+  if(+S.p.age>40||S.p.bmi>=30)e.unshift(['Mobility warm-up','1','5 min']);
+  return{n:d.n,f:d.f,e,rest:false};
+}
+
 /* ---------- winter arc logic ---------- */
-function isWinterSeason(d=new Date()){return d.getMonth()===9} // October (0-indexed)
-function winterYear(){return new Date().getFullYear()}
+function isWinterSeason(d=new Date()){const m=d.getMonth();return m===9||m===10||m===11||m===0} // October to January
+function winterYear(){const d=new Date();return d.getMonth()===0?d.getFullYear()-1:d.getFullYear()}
 function winterState(){
   if(!S)return null;
   const y=winterYear();
@@ -353,16 +408,30 @@ function applyTheme(){
   document.body.classList.toggle('winter',!!on);
   $('tagline').textContent=on?'Winter Arc Season Is Here. Ascend.':'Level Up In Real Life';
 }
+const MODES=['Beginner','Intermediate','Advanced'];
 function showWinterPrompt(force){
   const w=winterState();
   if(!force&&w)return;
   if(!force&&!isWinterSeason())return;
-  $('mw-title').textContent=w&&w.choice==='join'?'You are in the Winter Arc':'Winter Arc has begun';
+  const joined=w&&w.choice==='join'&&winterActive();
+  $('mw-a').style.display=joined?'none':'block';
+  $('mw-b').style.display=joined?'block':'none';
+  $('mw-title').textContent=joined?'Your Winter Arc':'Winter Arc is on';
+  if(joined){const m=w.mode!=null?w.mode:levelOf(S.p);$('mw-cur').textContent='Day '+winterDay()+' of 90 · Mode: '+MODES[m]+'.';$('mw-pick').textContent='Change mode (restarts the climb from that level)';}
+  $('mw-leave').style.display=joined?'block':'none';
   $('m-winter').classList.add('on');
 }
-function joinWinter(){
-  S.winter=S.winter||{};S.winter[winterYear()]={choice:'join',start:today()};save();
-  closeM('m-winter');applyTheme();render();
+function winterNext(){$('mw-leave').style.display='none';$('mw-a').style.display='none';$('mw-b').style.display='block';$('mw-cur').textContent='';$('mw-pick').textContent='Pick where your Winter Arc starts';$('mw-title').textContent='Choose your mode'}
+function pickMode(m){
+  S.winter=S.winter||{};
+  const w=winterState();
+  if(w&&w.choice==='join'&&winterActive()){w.mode=m;w.rb=winterDay()-1;toast('SYSTEM: Mode changed to '+MODES[m]+'. The climb restarts gently.')}
+  else{S.winter[winterYear()]={choice:'join',start:today(),mode:m,rb:0};toast('SYSTEM: Winter Arc started in '+MODES[m]+' mode. Easy first, harder every day.')}
+  save();closeM('m-winter');applyTheme();render();
+}
+function leaveWinter(){
+  const w=winterState();if(w&&w.choice==='join'){S.winter[winterYear()]={choice:'left',start:w.start}}
+  save();closeM('m-winter');applyTheme();render();toast('SYSTEM: You left the Winter Arc. Your normal plan is back. You can rejoin anytime.');
 }
 function declineWinter(){
   S.winter=S.winter||{};
@@ -554,7 +623,7 @@ function finishOnb(){
 function afterGoals(){go('s-home');setTimeout(()=>showWinterPrompt(false),400)}
 
 /* ---------- quests ---------- */
-function todayWorkout(){return S.prog[dayIdx()]}
+function todayWorkout(){return winterActive()?winterDayWorkout(winterDay()-1):S.prog[dayIdx()]}
 function dailyQuests(){
   const m=+S.p.exp,q=[
    {id:'water',t:'Drink '+S.c.water+' cups of water',xp:15,st:'VIT'},
@@ -636,13 +705,13 @@ function render(){
   const t=today(),dn=S.done[t]||{};
   $('h-quests').innerHTML=dailyQuests().map(q=>`<div class="quest ex ${dn[q.id]?'done':''}" onclick="toggleQuest('${q.id}')"><div class="chk">${dn[q.id]?'✓':''}</div><div style="flex:1"><b>${q.t}</b><p>+${q.xp} XP · ${q.st}</p></div></div>`).join('');
   const w=todayWorkout();
-  $('h-today').innerHTML=`<span class="badge">Day ${dayNum()+1}</span> <b>${w.n}</b><p>${w.f}</p>`+w.e.map(e=>`<div class="ex">${e[0]} — ${e[1]==='1'?e[2]:e[1]+' x '+e[2]}</div>`).join('');
+  $('h-today').innerHTML=`<span class="badge">${winterActive()?'❄ Winter Day '+winterDay():'Day '+(dayNum()+1)}</span> <b>${w.n}</b><p>${w.f}</p>`+w.e.map(e=>`<div class="ex">${e[0]} — ${e[1]==='1'?e[2]:e[1]+' x '+e[2]}</div>`).join('');
   const wa=winterActive();
   $('h-winter').style.display=wa?'block':'none';
-  if(wa){const d=winterDay();$('w-day').textContent='Day '+d+' / 90';$('w-bar').style.width=(d/90*100)+'%';$('w-txt').textContent=(90-d)+' days left. Stay consistent and earn the Winter Arc badge.'}
+  if(wa){const d=winterDay(),ww=winterState();$('w-day').textContent='Day '+d+' / 90';$('w-bar').style.width=(d/90*100)+'%';$('w-txt').textContent=MODES[ww.mode!=null?ww.mode:levelOf(S.p)]+' mode · '+(90-d)+' days left. Easy first, a little harder every day.'}
   const GN={muscle:'build muscle',fat:'lose fat',strong:'get strong',fit:'stay fit'};
-  const PI=progInfo();renderEq();$('p-sub').textContent=S.p.days+' training days per week, built to '+(S.p.goals||[S.p.goal]).map(g=>GN[g]).join(' + ')+'. Week '+(PI.wk+1)+' · Level: '+LV_NAMES[PI.lv]+' · Difficulty '+(PI.st+1)+'/6 · '+(PI.max?'Maximum difficulty reached.':'Next upgrade in '+PI.left+' day'+(PI.left===1?'':'s')+'.');
-  $('p-list').innerHTML=S.prog.map((d,i)=>`<div class="card"><div class="row dayhead"><div><h3>Day ${PI.wk*7+i+1}${i===dayIdx()?' · <span style="color:#fff">TODAY</span>':''}</h3><b>${d.n}</b><p>${d.f}</p></div></div>`+d.e.map(e=>`<div class="ex">${e[0]} — ${e[1]==='1'?e[2]:e[1]+' x '+e[2]}</div>`).join('')+'</div>').join('');
+  const PI=progInfo();renderEq();$('p-eq').style.display=wa?'none':'flex';if(wa){const ww=winterState(),d0=winterDay()-1,wk0=Math.floor(d0/7);$('p-sub').textContent='❄ Winter Arc · '+MODES[ww.mode!=null?ww.mode:levelOf(S.p)]+' mode · Day '+(d0+1)+' of 90. These exercises are only for the Winter Arc and get a little harder every day.';$('p-list').innerHTML=[0,1,2,3,4,5,6].map(i=>{const di=wk0*7+i,d=winterDayWorkout(di);return `<div class="card"><div class="row dayhead"><div><h3>Day ${di+1}${di===d0?' · <span style="color:#fff">TODAY</span>':''}</h3><b>${d.n}</b><p>${d.f}</p></div></div>`+d.e.map(e=>`<div class="ex">${e[0]} — ${e[1]==='1'?e[2]:e[1]+' x '+e[2]}</div>`).join('')+'</div>'}).join('')}else{$('p-sub').textContent=S.p.days+' training days per week, built to '+(S.p.goals||[S.p.goal]).map(g=>GN[g]).join(' + ')+'. Week '+(PI.wk+1)+' · Level: '+LV_NAMES[PI.lv]+' · Difficulty '+(PI.st+1)+'/6 · '+(PI.max?'Maximum difficulty reached.':'Next upgrade in '+PI.left+' day'+(PI.left===1?'':'s')+'.');
+  $('p-list').innerHTML=S.prog.map((d,i)=>`<div class="card"><div class="row dayhead"><div><h3>Day ${PI.wk*7+i+1}${i===dayIdx()?' · <span style="color:#fff">TODAY</span>':''}</h3><b>${d.n}</b><p>${d.f}</p></div></div>`+d.e.map(e=>`<div class="ex">${e[0]} — ${e[1]==='1'?e[2]:e[1]+' x '+e[2]}</div>`).join('')+'</div>').join('');}
   $('st-list').innerHTML=Object.entries(S.stats).map(([k,v])=>`<div class="row"><b>${{STR:'Strength',AGI:'Agility',VIT:'Vitality',INT:'Intelligence',SNS:'Sense'}[k]}</b><span>${v}</span></div><div class="bar"><i style="width:${Math.min(100,v)}%"></i></div>`).join('');
   const first=S.weights[0].w,last=S.weights[S.weights.length-1].w;
   $('st-body').textContent='Start '+first+' kg, now '+last+' kg ('+(last-first>=0?'+':'')+(last-first).toFixed(1)+' kg). BMI '+S.p.bmi.toFixed(1)+'.';
@@ -650,7 +719,7 @@ function render(){
   if($('pf-eq'))$('pf-eq').textContent='Current: '+EQS.find(e=>e.v===curEq()).d.replace(/\.$/,'')+'. Pick the one that matches where you train. Your plan updates right away.';
   const ws=winterState();
   if($('pf-acc'))$('pf-acc').textContent=U?('Signed in as '+(U.email||U.displayName||'your Google account')+'. Progress saves automatically.'):'';
-  $('pf-w').textContent=ws?(ws.choice==='join'?'You joined the Winter Arc on '+ws.start+'.':'You chose daily quests only this year. The System will ask again next October.'):(isWinterSeason()?'Winter Arc season is live. Tap below to choose.':'Winter Arc opens every October automatically.');
+  $('pf-w').textContent=ws?(ws.choice==='join'&&winterActive()?('You are in the Winter Arc: Day '+winterDay()+' of 90, '+MODES[ws.mode!=null?ws.mode:levelOf(S.p)]+' mode. Tap below to change mode or leave.'):(ws.choice==='left'?'You left the Winter Arc. You can rejoin anytime until January.':(ws.choice==='join'?'You finished the Winter Arc. Well done.':'You chose daily quests only. You can join anytime until January.'))):(isWinterSeason()?'Winter Arc is live. Tap below to join, even if you are late.':'Winter Arc runs from October to January.');
 }
 
 
