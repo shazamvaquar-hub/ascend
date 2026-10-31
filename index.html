@@ -773,7 +773,7 @@ function shareCard(){
   const a=achStats(),box=[[S.streak,'DAY STREAK'],[a.w,'WORKOUTS'],[ACH.filter(z=>z.f(a)).length,'ACHIEVEMENTS']];
   box.forEach((b,i)=>{const cx=210+i*330;x.fillStyle='rgba(255,255,255,.08)';x.fillRect(cx-140,800,280,230);x.fillStyle='#fff';x.font='italic 900 96px sans-serif';x.fillText(b[0],cx,925);x.fillStyle='#9fd0ff';x.font='bold 26px sans-serif';x.fillText(b[1],cx,985)});
   x.fillStyle='#fff';x.font='italic 900 74px sans-serif';x.fillText('I AM ASCENDING',W/2,1160);
-  x.fillStyle='#b2a8d4';x.font='36px sans-serif';x.fillText('Free fitness quests. Join me.',W/2,1230);x.fillText('shazamvaquar-hub.github.io/ascend',W/2,1290);
+  x.fillStyle='#b2a8d4';x.font='36px sans-serif';x.fillText('Free fitness quests. Join me.',W/2,1230);x.fillText('ascendfit.github.io/ascend',W/2,1290);
   cv.toBlob(async bl=>{
     const f=new File([bl],'ascend-progress.png',{type:'image/png'});
     try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:'My ASCEND progress'});return}}catch(e){if(e&&e.name==='AbortError')return}
